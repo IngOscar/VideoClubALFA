@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33414.496
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VideoClubALFA", "VideoClubALFA.csproj", "{933D8056-41E5-4D4A-A1C0-65493E1BE1CF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{933D8056-41E5-4D4A-A1C0-65493E1BE1CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{933D8056-41E5-4D4A-A1C0-65493E1BE1CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{933D8056-41E5-4D4A-A1C0-65493E1BE1CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{933D8056-41E5-4D4A-A1C0-65493E1BE1CF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {11A4D5B5-525C-4989-B71C-1673E7E2ED15}
+	EndGlobalSection
+EndGlobal

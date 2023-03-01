@@ -1,0 +1,117 @@
+﻿
+@model VideoClubALFA.Models.Clientes
+
+
+<div class="modal fade" id="ModalClientes" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content modal-xl">
+            <div class="modal-header">
+                <h5 class="modal-title">CLIENTES</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body fade-in">
+
+                @using (Html.BeginForm("", "", FormMethod.Post, new { id = "clientesform", enctype = "multipart/form-data" }))
+                {
+                    @*@Html.AntiForgeryToken()*@
+
+                <div class="row mt-1 mb-4">
+                    <h4>DATOS GENERALES DEL CLIENTE</h4>
+
+                    <div class="row">
+                        <div class="col-sm-3">
+                            @Html.HiddenFor(model => model.IdCliente)
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.NumSocio, "NO. SOCIO*", htmlAttributes: new { @class = "control-label", @style = "font-size: 12px;" })
+                                @Html.TextBoxFor(model => model.NumSocio, new { @class = "form-control form-control-sm", @maxlength = "255" })
+                                @Html.ValidationMessageFor(model => model.NumSocio, "", new { @class = "error" })
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.NombreCliente, "NOMBRE CLIENTE*", htmlAttributes: new { @class = "control-label", @style = "font-size: 12px;" })
+                                @Html.TextBoxFor(model => model.NombreCliente, new { @class = "form-control form-control-sm", @maxlength = "255" })
+                                @Html.ValidationMessageFor(model => model.NombreCliente, "", new { @class = "error" })
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.ApellidoPaternoCliente, "APELLIDO PATERNO*", htmlAttributes: new { @class = "control-label", @style = "font-size: 12px;" })
+                                @Html.TextBoxFor(model => model.ApellidoPaternoCliente, new { @class = "form-control form-control-sm", @maxlength = "255" })
+                                @Html.ValidationMessageFor(model => model.ApellidoPaternoCliente, "", new { @class = "error" })  <!--ValidationExpression="^[\s\S]{12,13}$"-->
+
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.ApellidoMaternoCliente, "APELLIDO MATERNO*", htmlAttributes: new { @class = "control-label", @style = "font-size: 12px;" })
+                                @Html.TextBoxFor(model => model.ApellidoMaternoCliente, new { @class = "form-control form-control-sm", @maxlength = "255" })
+                                @Html.ValidationMessageFor(model => model.ApellidoMaternoCliente, "", new { @class = "error" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-2">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.TelefonoCliente, "TELEFONO*", htmlAttributes: new { @class = "control-label", @style = "font-size: 12px;" })
+                                @Html.TextBoxFor(model => model.TelefonoCliente, new { @class = "form-control form-control-sm", @maxlength = "20" })
+                                @Html.ValidationMessageFor(model => model.TelefonoCliente, "", new { @class = "error" })
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.EmailCliente, "EMAIL*", htmlAttributes: new { @class = "control-label", @style = "font-size: 12px;" })
+                                @Html.TextBoxFor(model => model.EmailCliente, new { @class = "form-control form-control-sm", @maxlength = "255" })
+                                @Html.ValidationMessageFor(model => model.EmailCliente, "", new { @class = "error" })
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.IdBonos, "TIPO BONO*", htmlAttributes: new { @class = "control-label", @style = "font-size: 12px;" })
+                                @Html.DropDownList("IdBonos", ViewBag.TipoBonosSelectList as SelectList, "Seleccione tipo bono", new { @class = "form-control form-control-sm" })
+                                @Html.ValidationMessageFor(model => model.IdBonos, "", new { @class = "error" })
+                            </div>
+                        </div>
+                        <div class="col-sm-2">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.NumBonos, "CANTIDAD DE BONOS*", htmlAttributes: new { @class = "control-label", @style = "font-size: 12px;" })
+                                @Html.TextBoxFor(model => model.NumBonos, new { @class = "form-control form-control-sm", @maxlength = "255" })
+                                @Html.ValidationMessageFor(model => model.NumBonos, "", new { @class = "error" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-2">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.PorcentajeSancion, "% SANCION*", htmlAttributes: new { @class = "control-label", @style = "font-size: 12px;" })
+                                @Html.TextBoxFor(model => model.PorcentajeSancion, new { @class = "form-control form-control-sm", @type = "number", @maxlength = "50" })
+                                @Html.ValidationMessageFor(model => model.PorcentajeSancion, "", new { @class = "error" })
+                            </div>
+                        </div>
+                        <div class="col-sm-2">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.StatusCliente, "STATUS*", htmlAttributes: new { @class = "control-label", @style = "font-size: 12px;" })
+                                @Html.DropDownList("StatusCliente", ViewBag.StatusSelectList as SelectList, "Seleccione status", new { @class = "form-control form-control-sm" })
+                                @Html.ValidationMessageFor(model => model.StatusCliente, "", new { @class = "error" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer mt-4">
+                        <div class="col-sm-12 text-left">
+                            <small><span class="error" style="color:red;">obligatorio(*)</span></small>
+                            <br />
+                            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                        </div>
+                        <button type="button" class="btn btn-danger btn-sm" data-bs-dismiss="modal" aria-label="Close">Cerrar</button>
+                        <button type="reset" class="btn btn-outline-warning btn-sm">Reset</button>
+                        <button id="SaveCliente" type="button" class="btn btn-success btn-sm">Guardar</button>
+
+                    </div>
+                </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

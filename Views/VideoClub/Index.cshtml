@@ -1,0 +1,1173 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_VCShared.cshtml";
+}
+@section Styles
+{
+    <style>
+    </style>
+}
+
+
+<div class="wrapper fade-in">
+    <div id="main">
+
+        <section>
+            <nav class="navbar navbar-expand-xl navbar-expand-lg navbar-expand-md navbar-expand-sm">
+                <h3 class="ml-auto">TRANSACCIONES</h3>
+            </nav>
+            <!-- SPACER DASHED-->
+            <hr class="dashed" />
+
+        </section>
+        <div class="col-12">
+            @*<form method="post" action="" id="form1">*@
+            <div class="row">
+                <!-- Card Body -->
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="display compact nowrap roundcornersgv nowrap" id="tableTransaccionesList" style="width:100%; font-size:12px;">
+                            <thead>
+                                <tr>
+                                    <td></td>
+                                    <th>NO. PEDIDO</th>
+                                    <th>TRANSACCION</th>
+                                    <th>NOMBRE</th>
+                                    <th>TOTAL</th>                                   
+                                    <td style="text-align:center;">Acciones</td>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            @*</form>*@
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+        $(function () {
+            try {
+
+                objInicio.Controles();
+                objInicio.Eventos();
+
+            } catch (error) {
+                toastr.error("Ocurrió un error: " + error + " Si el problema, persiste contactar al equipo de soporte.");
+            }
+          
+        });
+
+         $(document).ready(function () {
+             try {
+                
+                
+
+             } catch (error) {
+                 toastr.error("Ocurrió un error: " + error + " Si el problema, persiste contactar al equipo de soporte.");
+             }
+         });
+
+        var objInicio = {
+            Controles: function () {
+               
+                tableTransaccionesList = $('#tableTransaccionesList').DataTable({
+                    deferRender: true,
+                    responsive: true,
+                    order: [[1, 'asc']],
+                    pageLength: 25,
+                    responsive: true,
+                    pagingType: "simple_numbers",
+                    fixedColumns: true,
+
+                    ajax: {
+                        url: "@Url.Action("ShowGridclientes", "Empresa")",
+                        data: {},
+                        type: "GET",
+                        datatype: "json"
+                    },
+                    columns: [
+                        {
+                            "data": "idTransaccion",
+                            "defaultContent": "",
+                            "visible": false
+                        },
+                        { "data": "TipoTransaccion", "visible": true, "defaultContent": "" },
+                        { "data": "TituloPelicula", "visible": true, "defaultContent": "" },
+                        { "data": "ClasificacionPelicula", "visible": true, "defaultContent": "" },
+                        { "data": "NombreCliente", "visible": true, "defaultContent": "" },
+                        {
+                            "data": "FechaInicio", "visible": true, "render": function (d) {
+                                /*return JsonToDate(d);*/
+                                return moment(d).format('DD/MM/YYYY');
+                            }, "defaultContent": ""
+                        },
+                        {
+                            "data": "FechaFinalizacion", "visible": true, "render": function (d) {
+                                /*return JsonToDate(d);*/
+                                return moment(d).format('DD/MM/YYYY');
+                            }, "defaultContent": ""
+                        },
+                        { "data": "TotalTransacicon", "visible": true, render: $.fn.dataTable.render.number('\,', '.', 2, '$ '), "defaultContent": "" },
+                        {
+                            "data": "idTransaccion", "render": function (data) {
+                                return 
+                                    "<a id='btndeletecliente' class='btn btn-outline-danger btn-sm ml-3' onclick='Deletecliente(" + data + ")' title='Eliminar empresa'><i class='fa fa-trash'></i></a>" +                                 
+                                    "<a id='btneditcliente' class='btn btn-outline-warning btn-sm ml-1 mr-1' title='Editar empresa' onclick='openModalTransacciones(" + data + ")'><i class='fa fa-pencil'></i></a>"
+                            },
+                            "orderable": false,
+                            "searchable": false,
+                            "width": "150px"
+                        }
+
+                    ],
+                    //columnDefs: [
+                    //    {
+                    //        "targets": 1, // your case first column
+                    //        "className": "text-center",
+                    //        "defaultContent": "",
+                    //        "width": "20%"
+                    //    },
+                    //    {
+                    //        "targets": 2,
+                    //        "className": "text-right",
+                    //        "defaultContent": "",
+                    //        "width": "20%"
+                    //    }
+                    //],
+                    ordering: true,
+                    select: false,
+                    searching: true, // ocultar busqueda
+                    lengthChange: false, // ocultar parte superior izquierda
+                    dom: 'Bfrtip', // Oculta el boton de exportar en csv
+                    buttons: [
+                        //{
+                        //    text: '<i class="fa fa-fw fa-user-plus"></i> Alta Empresa',
+                        //   /* text: 'Alta empresa',*/
+                        //    attr: { class: 'btn btn-success btn-sm mb-4 mr-4' },
+                        //    titleAttr: 'Alta Empresa',
+                        //    action: function (e, dt, node, config) {
+                        //        openModalEmpresa(0);
+                        //    }
+                        //    //action: function (e, dt, node, config) {
+                        //    //    alert('Activated!');
+                        //    //    this.disable(); // disable button
+                        //    //}
+                        //},
+                        //{
+                        //    extend: 'spacer',
+                        //    /*style: 'bar',*/
+                        //    text: '',
+                        //    /*attr: { class: 'mb-4' }*/
+                        //},
+                        //{
+                        //    text: '<i class="fa fa-bank"></i> IMSS',
+                        //    attr: { class: 'btn btn-outline-secondary btn-sm mb-4' },
+                        //    titleAttr: 'IMSS',
+                        //    action: function (e, dt, node, config) {
+                        //        openModal(0);
+                        //    }
+                        //},
+                        //{
+                        //    text: '<i class="fa fa-bank"></i> Sucursales',
+                        //    attr: { class: 'btn btn-outline-secondary btn-sm mb-4' },
+                        //    titleAttr: 'Sucursales',
+                        //    action: function (e, dt, node, config) {
+                        //        openModal(0);
+                        //    }
+                        //},
+                        //{
+                        //    text: '<i class="fa fa-cubes"></i> Clases de nominas',
+                        //    attr: { class: 'btn btn-outline-secondary btn-sm mb-4' },
+                        //    titleAttr: 'Clases de nominas',
+                        //    action: function (e, dt, node, config) {
+                        //        openModal(0);
+                        //    }
+                        //},
+                        //{
+                        //    text: '<i class="fa fa-connectdevelop"></i> Estructura',
+                        //    attr: { class: 'btn btn-outline-secondary btn-sm mb-4' },
+                        //    titleAttr: 'Estructura de la empresa',
+                        //    action: function (e, dt, node, config) {
+                        //        openModal(0);
+                        //    }
+                        //},
+                        //{
+                        //    text: '<i class="fa fa-bank"></i> Banco',
+                        //    attr: { class: 'btn btn-outline-secondary btn-sm mb-4' },
+                        //    titleAttr: 'Banco',
+                        //    action: function (e, dt, node, config) {
+                        //        openModal(0);
+                        //    }
+                        //},
+                        //{
+                        //    extend: 'spacer',
+                        //    /*style: 'bar',*/
+                        //    text: '',
+                        //    /*attr: { class: 'mb-4' }*/
+                        //}
+                        {
+                            text: '<i class="fa fa-cloud-download"></i> Exportar',
+                            attr: { class: 'btn btn-outline-secondary btn-sm mb-4 text-right' },
+                            titleAttr: 'Exportar',
+                            action: function (e, dt, node, config) {
+                               
+                            }
+                        },
+                        {
+                            text: '<i class="fa fa-cloud-upload"></i> Importar',
+                            attr: { class: 'btn btn-outline-secondary btn-sm mb-4 text-right' },
+                            titleAttr: 'Importar',
+                            action: function (e, dt, node, config) {
+                               
+                            }
+                        },
+                    ],
+                    language: {
+                        emptyTable: "",
+                        info: " ",
+                        url: "@Url.Content("~/Content/DataTables/idioma/datatable.es-ES.json")"
+                    }
+                });
+            },
+            Eventos: function () {
+                //Empresa
+                $('body').contextmenu(function () {
+                    return false;
+                });
+
+                //$("#Calculo_sm_mensual_30_dias").on('change', function () {
+                //    if ($("#Calculo_sm_mensual_30_dias").is(":checked")) {
+                //        $('#Calculo_sm_mensual_30_4_dias').prop('checked', false); // Unchecks it
+                //    }
+                //});
+                //$("#Calculo_sm_mensual_30_4_dias").on('change', function () {
+                //    if ($("#Calculo_sm_mensual_30_4_dias").is(":checked")) {
+                //        $('#Calculo_sm_mensual_30_dias').prop('checked', false); // Unchecks it
+                //    }
+                //});
+
+
+                //Registros Patronales
+
+
+            }
+        }
+
+        var objModalEmpresa = {
+            Controles: function () {
+                //EmpresaModal  /*Se creo este archivo "jquery.validate.date.js" por que a veces en CHROME no detecta bien la fecha selecionada con Jquery UI Datepicker*/
+                $("#Fechaconstitucion").datepicker({
+                    autoSize: true,
+                    dateFormat: "dd/mm/yy",
+                    changeYear: true,
+                    changeMonth: true,
+                    maxDate: "+0d",
+                    showAnim: "fade",
+                    autoClose: true,
+                    yearRange: "-100:+0",
+                    onSelect: function (selectedDate) {
+                        //code here
+                    },
+                    beforeShow: function (input, obj) {
+                        $(input).after($(input).datepicker('widget'));
+                    }
+                });
+                $("#Codigopostal").keyup(function () {
+                    if ($(this).val().length == 5) {
+
+                        CPclienteInfo();
+                        $("#Id_codigopostal").prop('disabled', false);
+                    }
+                    else {
+                        $("#Id_codigopostal").prop('disabled', true);
+                    }
+                });
+
+                $("#Csddesde").datepicker({ /*Se creo este archivo "jquery.validate.date.js" por que a veces en CHROME no detecta bien la fecha selecionada con Jquery UI Datepicker*/
+                    autoSize: true,
+                    dateFormat: "dd/mm/yy",
+                    changeYear: true,
+                    changeMonth: true,
+                    /* maxDate: "+0d",*/
+                    showAnim: "fade",
+                    autoClose: true,
+                    yearRange: "-04:+04",
+                    onSelect: function (selectedDate) {
+                        // other code
+                    },
+                    beforeShow: function (input, obj) {
+                        $(input).after($(input).datepicker('widget'));
+                    }
+                });
+                $("#Csdhasta").datepicker({ /*Se creo este archivo "jquery.validate.date.js" por que a veces en CHROME no detecta bien la fecha selecionada con Jquery UI Datepicker*/
+                    autoSize: true,
+                    dateFormat: "dd/mm/yy",
+                    changeYear: true,
+                    changeMonth: true,
+                    /* maxDate: "+0d",*/
+                    showAnim: "fade",
+                    autoClose: true,
+                    yearRange: "-04:+04",
+                    onSelect: function (selectedDate) {
+                        // other code
+                    },
+                    beforeShow: function (input, obj) {
+                        $(input).after($(input).datepicker('widget'));
+                    }
+                });
+            },
+            Eventos: function () {
+                //ModalEmpresa
+            $("#Logo_Uploaded").change(function (e) {
+                /*$("#img_displaylogo").show();  */
+                var file = document.querySelector('#Logo_Uploaded').files[0];
+                getBase64(file).then(
+                    data => { base64Documento = data });
+                for (var i = 0; i < e.originalEvent.srcElement.files.length; i++) {
+                    var file = e.originalEvent.srcElement.files[i];
+                    var img = document.getElementById("img_displaylogo");
+                    var reader = new FileReader();
+                    reader.onloadend = function () {
+                        img.src = reader.result;
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+            $("#Codigopostal").focus(function () {
+                $("#Codigopostal").val("");
+                /*document.getElementById("resultado").innerText = "";*/
+            });
+            $("#Emailempresa").focus(function () {
+                $("#Emailempresa").val("");
+                /*document.getElementById("resultado").innerText = "";*/
+            });
+            $("#Csdpassword").focus(function () {
+                $("#Csdpassword").val("");
+                /*document.getElementById("resultado").innerText = "";*/
+            });
+            $("#Savecliente").on('click', function (e) {
+                if ($('#Razonsocial').val().length > 0 && $('#Nombreempresa').val().length > 0 && $('#Rfcempr').val().length > 0 && $('#Reginfonavit').val().length > 0 && $('#Regfonacot').val().length > 0 &&
+                    $('#Fechaconstitucion').val().length > 0 && $('#Calle_numero_empresa').val().length > 0 && $('#Codigopostal').val().length > 0 && $('#Representanteemp').val().length > 0 &&
+                    $('#Telefonoempresa').val().length > 0 && $('#Emailempresa').val().length > 0 && parseInt($('#C_RegimenFiscal').val()) > 0 && $('#C_OrigenRecurso').val().length > 0 &&
+                    $('#Csdpassword').val().length > 0 && $('#Csddesde').val().length > 0 && $('#Csdhasta').val().length > 0) {
+                    let modelcliente = $("#clienteform").serialize(); // or use the id of the form is you have given it one or .form for all forms      /*Doesnt work with files upload input*/
+
+                        //verify if exists
+                        $.ajax({
+                            url: "@Url.Action("IfExistscliente", "Empresa")",
+                            type: "GET",
+                            contentType: 'application/json',
+                            dataType: 'json',
+                            data: modelcliente,
+                            success: function (result) {
+                                if (result.result == true) {
+                                    alertify.confirm('¡Advertencia!', 'La empresa con ese RFC ya existe y habia sido eliminada, ¿Desea recuperar los datos de la empresa?', function () {
+                                        $.ajax({
+                                            url: "@Url.Action("ReActivatecliente", "Empresa")",
+                                            type: "POST",
+                                            contentType: 'application/json',
+                                            dataType: 'html',
+                                            data: modelcliente,
+                                            success: function () {
+                                                $("#clienteform").find('input:text, input:password, input:file, select, textarea').val(''); //Limpia elementos en el form
+                                                $("#clienteform").find('input:radio, input:checkbox').prop('checked', false).prop('selected', false); //Limpia los checkbnos en el form
+                                                $("#img_displaylogo").attr("src", "@Session["logo_temp"]"); //Reset image display
+                                                tableEmpresasList.ajax.reload(); //Recarga el Datatable
+                                                $('#ModalEmpresa').modal('toggle'); //Cierra modal
+                                                toastr.success("Empresa recuperada exitosamente");
+                                            },
+                                            error: function (jqXHR, textStatus, errorThrown) {
+                                                toastr.error("Error al recuperar a la empresa");
+                                            }
+                                        });
+
+                                    }, function () { alertify.error('Operacion cancelada!'); });
+                                } else {
+                                    let modelcliente = new FormData($("#clienteform")[0]); // or use the id of the form is you have given it one or .form for all forms
+                                    $.ajax({
+                                        url: "@Url.Action("Savecliente", "Empresa")",
+                                        type: "POST",
+                                        /*contentType: 'application/x-www-form-urlencoded; charset=UTF-8',*/
+                                        contentType: false,
+                                        dataType: 'html',
+                                        data: modelcliente,
+                                        processData: false,
+                                        success: function () {
+                                            $("#clienteform").find('input:text, input:password, input:file, select, textarea').val(''); //Limpia elementos en el form
+                                            $("#clienteform").find('input:radio, input:checkbox').prop('checked', false).prop('selected', false); //Limpia los checkbnos en el form
+                                            $("#img_displaylogo").attr("src", "@Session["logo_temp"]"); //Reset image display
+                                            tableEmpresasList.ajax.reload(); //Recarga el Datatable
+                                            $('#ModalEmpresa').modal('toggle'); //Cierra modal
+                                            toastr.success("Alta de empresa exitosa");
+                                        },
+                                        error: function (jqXHR, textStatus, errorThrown) {
+                                            toastr.error("Error al dar de alta la empresa");
+                                        }
+                                    });
+                                }
+                            },
+                            error: function (jqXHR, textStatus, errorThrown) {
+                                toastr.error("Error el agregar el registro");
+                            }
+                        });
+                } else {
+                    toastr.warning("Faltan datos obligatorios (*)");
+                }
+            });
+            }
+        }
+
+        var objEstructuraEmpresa = {
+            Controles: function () {
+                 //Lista de Areas
+                tableAreasEmpresa = $('#tableAreasEmpresa').DataTable({
+                    deferRender: true,
+                    responsive: true,
+                    order: [[1, 'asc']],
+                    pageLength: 5,
+                    responsive: true,
+                    pagingType: "simple_numbers",
+                    fixedColumns: true,
+
+                    ajax: {
+                        url: "@Url.Action("ShowGridtableAreasEmpresa", "Empresa")",
+                        data: {},
+                        type: "GET",
+                        datatype: "json"
+                    },
+                    columns: [
+                        {
+                            "data": "Id_area",
+                            "defaultContent": "",
+                            "visible": false
+                        },
+                        { "data": "Nombre_area", "visible": true, "defaultContent": "" },
+                        {
+                            "data": "Id_area", "render": function (data) {
+                                return "<a id='btndeletearea' class='btn btn-outline-danger btn-sm ml-3' onclick='DeleteArea(" + data + ")' title='Eliminar area'><i class='fa fa-trash'></i></a>" +
+                                    "<a id='btneditarea' class='btn btn-outline-warning btn-sm ml-1 mr-1' title='Editar area' onclick='EditArea(" + data + ")'><i class='fa fa-pencil'></i></a>"
+                            },
+                            "className": "text-right",
+                            "orderable": false,
+                            "searchable": false,
+                            "width": "20%"
+                        }
+
+                    ],
+                    ordering: true,
+                    select: false,
+                    searching: true, // ocultar busqueda
+                    lengthChange: false, // ocultar parte superior izquierda
+                    dom: 'Bfrtip', // Oculta el boton de exportar en csv
+                    buttons: [
+                        {
+                            text: '<i class="fa fa-fw fa-user-plus"></i> Guardar Area',
+                            attr: { class: 'btn btn-success btn-sm mb-4 mr-4' },
+                            titleAttr: 'Guardar Area',
+                            action: function (e, dt, node, config) {
+
+                                if ($('#Nombre_area').val().length > 0 ) {
+                                    let data = $("#estructuraareaform").serialize(); // or use the id of the form is you have given it one .form for all forms
+
+                                    //verify if exists
+                                     $.ajax({
+                                        url: "@Url.Action("IfExistsArea", "Empresa")",
+                                        dataType: 'json',
+                                        contentType: 'application/json',
+                                        data: data,
+                                         success: function (result) {
+                                             if (result.result == true) {
+                                                 alertify.confirm('¡Advertencia!', 'El area ya existe y habia sido eliminado, ¿Desea recuperar el registro patronal?', function () {
+                                                     $.ajax({
+                                                         url: "@Url.Action("ReActivateArea", "Empresa")",
+                                                         dataType: 'html',
+                                                         contentType: 'application/json',
+                                                         data: data,
+                                                         success: function () {
+                                                             $("#estructuraareaform").find('input:text, input:password, input:file, select, textarea').val(''); //Limpia elementos en el form
+                                                             tableAreasEmpresa.ajax.reload();
+                                                             toastr.success("Area recuperada exitosamente");
+                                                         },
+                                                         error: function (jqXHR, textStatus, errorThrown) {
+                                                             toastr.error("Error al recuperar el area");
+                                                         }
+                                                     });
+
+                                                 }, function () { alertify.error('Operacion cancelada!') });
+                                             } else {
+                                                  $.ajax({
+                                                      url: "@Url.Action("SaveArea", "Empresa")",
+                                                     dataType: 'html',
+                                                     contentType: 'application/json',
+                                                     data: data,
+                                                     success: function () {
+                                                         $("#estructuraareaform").find('input:text, input:password, input:file, select, textarea').val(''); //Limpia elementos en el form
+                                                         tableAreasEmpresa.ajax.reload();
+                                                         toastr.success("Area dado de alta exitosamente");
+                                                     },
+                                                     error: function (jqXHR, textStatus, errorThrown) {
+                                                         toastr.error("Error al agregar el area, posiblemente ya exista esa area en la empresa");
+                                                     }
+                                                 });
+                                             }
+                                        },
+                                        error: function (jqXHR, textStatus, errorThrown) {
+                                            toastr.error("Error el agregar el area");
+                                        }
+                                     });
+                                } else  {
+                                    toastr.warning("Faltan datos obligatorios (*)");
+                                }
+                            }
+                        },
+                        {
+                            extend: 'spacer',
+                            /*style: 'bar',*/
+                            text: '',
+                            /*attr: { class: 'mb-4' }*/
+                        },
+                        {
+                            text: '<i class="fa fa-cloud-download"></i> Exportar',
+                            attr: { class: 'btn btn-outline-secondary btn-sm mb-4 text-right' },
+                            titleAttr: 'Exportar',
+                            action: function (e, dt, node, config) {
+                                openModal(0);
+                            }
+                        },
+                        {
+                            text: '<i class="fa fa-cloud-upload"></i> Importar',
+                            attr: { class: 'btn btn-outline-secondary btn-sm mb-4 text-right' },
+                            titleAttr: 'Importar',
+                            action: function (e, dt, node, config) {
+                                openModal(0);
+                            }
+                        },
+                    ],
+                    language: {
+                        emptyTable: "",
+                        info: " ",
+                        url: "@Url.Content("~/Content/DataTables/idioma/datatable.es-ES.json")"
+                    }
+                });
+
+             //Lista de Departamentos de la empresa
+                tableDepartamentosEmpresa = $('#tableDepartamentosEmpresa').DataTable({
+                    deferRender: true,
+                    responsive: true,
+                    order: [[1, 'asc']],
+                    pageLength: 5,
+                    responsive: true,
+                    pagingType: "simple_numbers",
+                    fixedColumns: true,
+
+                    ajax: {
+                        url: "@Url.Action("ShowGridtableDepartamentosEmpresa", "Empresa")",
+                        data: {},
+                        type: "GET",
+                        datatype: "json"
+                    },
+                    columns: [
+                        {
+                            "data": "Id_departamento",
+                            "defaultContent": "",
+                            "visible": false
+                        },
+                        { "data": "Nombre_departamento", "visible": true, "defaultContent": "" },
+                        { "data": "Nombre_area", "visible": true, "defaultContent": "" },
+                        {
+                            "data": "Id_departamento", "render": function (data) {
+                                return "<a id='btndeletedepartamento' class='btn btn-outline-danger btn-sm ml-3' onclick='DeleteDepartamento(" + data + ")' title='Eliminar departamento'><i class='fa fa-trash'></i></a>" +
+                                    "<a id='btneditdepartamento' class='btn btn-outline-warning btn-sm ml-1 mr-1' title='Editar departamento' onclick='EditDepartamento(" + data + ")'><i class='fa fa-pencil'></i></a>"
+                            },
+                            "className": "text-right",
+                            "orderable": false,
+                            "searchable": false,
+                            "width": "20%"
+                        }
+
+                    ],
+                    ordering: true,
+                    select: false,
+                    searching: true, // ocultar busqueda
+                    lengthChange: false, // ocultar parte superior izquierda
+                    dom: 'Bfrtip', // Oculta el boton de exportar en csv
+                    buttons: [
+                        {
+                            text: '<i class="fa fa-fw fa-user-plus"></i> Guardar Departamento',
+                            attr: { class: 'btn btn-success btn-sm mb-4 mr-4' },
+                            titleAttr: 'Guardar Departamento',
+                            action: function (e, dt, node, config) {
+                                if ($('#Id_area_departamento').val().length > 0 && $('#Nombre_departamento').val().length > 0) {
+                                    let data = $("#estructuradepartamentoform").serialize(); // or use the id of the form is you have given it one .form for all forms
+
+                                    //verify if exists
+                                     $.ajax({
+                                        url: "@Url.Action("IfExistsDepartamento", "Empresa")",
+                                        dataType: 'json',
+                                        contentType: 'application/json',
+                                        data: data,
+                                         success: function (result) {
+                                             if (result.result == true) {
+                                                 alertify.confirm('¡Advertencia!', 'El departamento ya existe y habia sido eliminado, ¿Desea recuperar el registro patronal?', function () {
+                                                     $.ajax({
+                                                         url: "@Url.Action("ReActivateDepartamento", "Empresa")",
+                                                         dataType: 'html',
+                                                         contentType: 'application/json',
+                                                         data: data,
+                                                         success: function () {
+                                                             $("#estructuradepartamentoform").find('input:text, input:password, input:file, select, textdepartamento').val(''); //Limpia elementos en el form
+                                                             tableDepartamentosEmpresa.ajax.reload();
+                                                             toastr.success("Departamento recuperada exitosamente");
+                                                         },
+                                                         error: function (jqXHR, textStatus, errorThrown) {
+                                                             toastr.error("Error al recuperar el departamento");
+                                                         }
+                                                     });
+
+                                                 }, function () { alertify.error('Operacion cancelada!') });
+                                             } else {
+                                                  $.ajax({
+                                                      url: "@Url.Action("SaveDepartamento", "Empresa")",
+                                                     dataType: 'html',
+                                                     contentType: 'application/json',
+                                                     data: data,
+                                                     success: function () {
+                                                         $("#estructuradepartamentoform").find('input:text, input:password, input:file, select, textdepartamento').val(''); //Limpia elementos en el form
+                                                         tableDepartamentosEmpresa.ajax.reload();
+                                                         toastr.success("Departamento dado de alta exitosamente");
+                                                     },
+                                                     error: function (jqXHR, textStatus, errorThrown) {
+                                                         toastr.error("Error al agregar el departamento, posiblemente ya exista es departamento en esa area de la empresa");
+                                                     }
+                                                 });
+                                             }
+                                        },
+                                        error: function (jqXHR, textStatus, errorThrown) {
+                                            toastr.error("Error el agregar el departamento");
+                                        }
+                                     });
+                                } else  {
+                                    toastr.warning("Faltan datos obligatorios (*)");
+                                }
+                            }
+                        },
+                        {
+                            extend: 'spacer',
+                            /*style: 'bar',*/
+                            text: '',
+                            /*attr: { class: 'mb-4' }*/
+                        },
+                        {
+                            text: '<i class="fa fa-cloud-download"></i> Exportar',
+                            attr: { class: 'btn btn-outline-secondary btn-sm mb-4 text-right' },
+                            titleAttr: 'Exportar',
+                            action: function (e, dt, node, config) {
+                                openModal(0);
+                            }
+                        },
+                        {
+                            text: '<i class="fa fa-cloud-upload"></i> Importar',
+                            attr: { class: 'btn btn-outline-secondary btn-sm mb-4 text-right' },
+                            titleAttr: 'Importar',
+                            action: function (e, dt, node, config) {
+                                openModal(0);
+                            }
+                        },
+                    ],
+                    language: {
+                        emptyTable: "",
+                        info: " ",
+                        url: "@Url.Content("~/Content/DataTables/idioma/datatable.es-ES.json")"
+                    }
+                });
+
+
+             //Lista de los puestos de la empresa
+                tablePuestosEmpresa = $('#tablePuestosEmpresa').DataTable({
+                    deferRender: true,
+                    responsive: true,
+                    order: [[1, 'asc']],
+                    pageLength: 5,
+                    responsive: true,
+                    pagingType: "simple_numbers",
+                    fixedColumns: true,
+
+                    ajax: {
+                        url: "@Url.Action("ShowGridtablePuestosEmpresa", "Empresa")",
+                        data: {},
+                        type: "GET",
+                        datatype: "json"
+                    },
+                    columns: [
+                        {
+                            "data": "Id_puesto",
+                            "defaultContent": "",
+                            "visible": false
+                        },
+                        { "data": "Nombre_puesto", "visible": true, "defaultContent": "" },
+                        { "data": "Nombre_departamento", "visible": true, "defaultContent": "" },
+                        { "data": "Nombre_area", "visible": true, "defaultContent": "" },
+                        {
+                            "data": "Id_puesto", "render": function (data) {
+                                return "<a id='btndeletepuesto' class='btn btn-outline-danger btn-sm ml-3' onclick='DeletePuesto(" + data + ")' title='Eliminar puesto'><i class='fa fa-trash'></i></a>" +
+                                    "<a id='btneditpuesto' class='btn btn-outline-warning btn-sm ml-1 mr-1' title='Editar puesto' onclick='EditPuesto(" + data + ")'><i class='fa fa-pencil'></i></a>"
+                            },
+                            "className": "text-right",
+                            "orderable": false,
+                            "searchable": false,
+                            "width": "20%"
+                        }
+
+                    ],
+                    ordering: true,
+                    select: false,
+                    searching: true, // ocultar busqueda
+                    lengthChange: false, // ocultar parte superior izquierda
+                    dom: 'Bfrtip', // Oculta el boton de exportar en csv
+                    buttons: [
+                        {
+                            text: '<i class="fa fa-fw fa-user-plus"></i> Guardar Puesto',
+                            attr: { class: 'btn btn-success btn-sm mb-4 mr-4' },
+                            titleAttr: 'Guardar Puesto',
+                            action: function (e, dt, node, config) {
+                                if ($('#Id_area_puesto').val().length > 0 && $('#Id_departamento_puesto').val().length > 0 && $('#Nombre_puesto').val().length > 0 ) {
+                                    let data = $("#estructurapuestoform").serialize(); // or use the id of the form is you have given it one .form for all forms
+
+                                    //verify if exists
+                                     $.ajax({
+                                        url: "@Url.Action("IfExistsPuesto", "Empresa")",
+                                        dataType: 'json',
+                                        contentType: 'application/json',
+                                        data: data,
+                                         success: function (result) {
+                                             if (result.result == true) {
+                                                 alertify.confirm('¡Advertencia!', 'El puesto ya existe y habia sido eliminado, ¿Desea recuperar el registro patronal?', function () {
+                                                     $.ajax({
+                                                         url: "@Url.Action("ReActivatePuesto", "Empresa")",
+                                                         dataType: 'html',
+                                                         contentType: 'application/json',
+                                                         data: data,
+                                                         success: function () {
+                                                             $("#estructurapuestoform").find('input:text, input:password, input:file, select, textpuesto').val(''); //Limpia elementos en el form
+                                                             tablePuestosEmpresa.ajax.reload();
+                                                             toastr.success("Puesto recuperada exitosamente");
+                                                         },
+                                                         error: function (jqXHR, textStatus, errorThrown) {
+                                                             toastr.error("Error al recuperar el puesto");
+                                                         }
+                                                     });
+
+                                                 }, function () { alertify.error('Operacion cancelada!') });
+                                             } else {
+                                                  $.ajax({
+                                                      url: "@Url.Action("SavePuesto", "Empresa")",
+                                                     dataType: 'html',
+                                                     contentType: 'application/json',
+                                                     data: data,
+                                                     success: function () {
+                                                         $("#estructurapuestoform").find('input:text, input:password, input:file, select, textpuesto').val(''); //Limpia elementos en el form
+                                                         tablePuestosEmpresa.ajax.reload();
+                                                         toastr.success("Puesto dado de alta exitosamente");
+                                                     },
+                                                     error: function (jqXHR, textStatus, errorThrown) {
+                                                         toastr.error("Error al agregar el puesto, posiblemente ya exista ese puesto, dntro del departamento de esa area de la empresa");
+                                                     }
+                                                 });
+                                             }
+                                        },
+                                        error: function (jqXHR, textStatus, errorThrown) {
+                                            toastr.error("Error el agregar el puesto");
+                                        }
+                                     });
+                                } else  {
+                                    toastr.warning("Faltan datos obligatorios (*)");
+                                }
+                            }
+                        },
+                        {
+                            extend: 'spacer',
+                            /*style: 'bar',*/
+                            text: '',
+                            /*attr: { class: 'mb-4' }*/
+                        },
+                        {
+                            text: '<i class="fa fa-cloud-download"></i> Exportar',
+                            attr: { class: 'btn btn-outline-secondary btn-sm mb-4 text-right' },
+                            titleAttr: 'Exportar',
+                            action: function (e, dt, node, config) {
+                                openModal(0);
+                            }
+                        },
+                        {
+                            text: '<i class="fa fa-cloud-upload"></i> Importar',
+                            attr: { class: 'btn btn-outline-secondary btn-sm mb-4 text-right' },
+                            titleAttr: 'Importar',
+                            action: function (e, dt, node, config) {
+                                openModal(0);
+                            }
+                        },
+                    ],
+                    language: {
+                        emptyTable: "",
+                        info: " ",
+                        url: "@Url.Content("~/Content/DataTables/idioma/datatable.es-ES.json")"
+                    }
+                });
+            },
+            Eventos: function () {
+                $("#Id_area_puesto").change(function (e) {
+                    GetDepartamentosEmpresa($("#Id_area_puesto").val());
+                });
+            }
+        }
+
+
+
+
+
+
+
+        //FUNCTIONS MODAL EMPRESA
+        function Deletecliente(idcliente) {
+            alertify.confirm('Eliminar empresa', '¿Seguro que desea eliminar la empresa?', function () {
+                $.ajax({
+                    url: "@Url.Action("Deletecliente", "Empresa")",
+                    dataType: 'html',
+                    contentType: 'application/json',
+                    data: { idcliente: idcliente },
+                    success: function () {
+                        tableEmpresasList.ajax.reload();
+                        toastr.success("¡Empresa eliminada correctamente!");
+
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        toastr.error("Error al eliminar la empresa");
+                    }
+                 });
+            }, function () { alertify.error('Operacion cancelada!') });
+        }
+
+        function openModalEmpresa(idcliente) {
+            $("#Id_cliente").val(idcliente);
+            if (idcliente != 0) {
+                $.ajax({
+                    url: "@Url.Action("Getcliente", "Empresa")",
+                    data: { idcliente: idcliente },
+                    success: function (data) {
+                        if (data != null) {
+                            $("#Id_cliente").val(data.cliente.Id_cliente);
+                            $("#Razonsocial").val(data.cliente.Razonsocial);
+                            $("#Nombreempresa").val(data.cliente.Nombreempresa);
+                            $("#Rfcempr").val(data.cliente.Rfcempr);
+                            $("#Reginfonavit").val(data.cliente.Reginfonavit);
+                            $("#Regfonacot").val(data.cliente.Regfonacot);
+                            $("#Fechaconstitucion").val(moment(data.cliente.Fechaconstitucion).format('DD/MM/YYYY'));
+                            $("#Calle_numero_empresa").val(data.cliente.Calle_numero_empresa);
+                            $("#Codigopostal").val(data.cliente.Codigopostal);
+                            CPclienteInfo()
+                            $("#Id_codigopostal").val(data.cliente.Id_codigopostal);
+                            $("#Municipio").val(data.cliente.Municipio);
+                            $("#EntidadFederativa").val(data.cliente.EntidadFederativa);
+                            $("#Pais").val(data.cliente.Pais);
+                            $("#Representanteemp").val(data.cliente.Representanteemp);
+                            $("#Telefonoempresa").val(data.cliente.Telefonoempresa);
+                            $("#Movilempresa").val(data.cliente.Movilempresa);
+                            $("#Emailempresa").val(data.cliente.Emailempresa);
+                            $("#C_RegimenFiscal").val(data.cliente.C_RegimenFiscal);
+                            $("#C_OrigenRecurso").val(data.cliente.C_OrigenRecurso);
+                            //$("#Csdempresa").val(data.cliente.Csdempresa);
+                            //$("#Csdkeyempresa").val(data.cliente.Csdkeyempresa);
+                            $("#Csdpassword").val(data.cliente.Csdpassword);
+                            $("#Csddesde").val(moment(data.cliente.Csddesde).format('DD/MM/YYYY'));
+                            $("#Csdhasta").val(moment(data.cliente.Csdhasta).format('DD/MM/YYYY'));
+                            $('#ModalEmpresa').modal('show');
+                        }
+                    }
+                });
+            } else {
+                $("#Id_cliente").val("");
+                $("#Razonsocial").val("");
+                $("#Nombreempresa").val("");
+                $("#Rfcempr").val("");
+                $("#Reginfonavit").val("");
+                $("#Regfonacot").val("");
+                $("#Fechaconstitucion").val("");
+                $("#Calle_numero_empresa").val("");
+                $("#Codigopostal").val("");
+                $("#Id_codigopostal").val("");
+                $("#Municipio").val("");
+                $("#EntidadFederativa").val("");
+                $("#Pais").val("");
+                $("#Representanteemp").val("");
+                $("#Telefonoempresa").val("");
+                $("#Movilempresa").val("");
+                $("#Emailempresa").val("");
+                $("#C_RegimenFiscal").val("");
+                $("#C_OrigenRecurso").val("");
+                //$("#Csdempresa").val(data.cliente.Csdempresa);
+                //$("#Csdkeyempresa").val(data.cliente.Csdkeyempresa);
+                $("#Csdpassword").val("");
+                $("#Csddesde").val("");
+                $("#Csdhasta").val("");
+                $('#ModalEmpresa').modal('show');
+            }
+        }
+
+
+
+        function CPclienteInfo() {
+             $.ajax({
+                 type: 'GET',
+                 url: '@Url.Action("GetCPInfo", "Empresa")',
+                 contentType: "application/json; charset=utf-8",
+                 data: { CP: $('#Codigopostal').val().trim() },
+                 dataType: "json",
+                 success: function (data) {
+                     var c, m, e, p;
+
+                     for (var i = 0; i < data.oLstInfoCP.length; i++) {
+                         c += '<option value="' + data.oLstInfoCP[i].Id_codigopostal + '">' + data.oLstInfoCP[i].Colonia + '</option>';
+                         m += '<option value="' + data.oLstInfoCP[i].Id_codigopostal + '">' + data.oLstInfoCP[i].Municipio + '</option>';
+                         e += '<option value="' + data.oLstInfoCP[i].Id_estado + '">' + data.oLstInfoCP[i].Nombre_del_estado + '</option>';
+                         p += '<option value="' + data.oLstInfoCP[i].Id_estado + '">' + data.oLstInfoCP[i].Nombre_del_pais + '</option>';
+                     }
+                     $("#Id_codigopostal").html(c);
+                     $("#Municipio").html(m);
+                     $("#EntidadFederativa").html(e);
+                     $("#Pais").html(p);
+                 },
+                 error: function () {
+                     toastr.error("Error al consultar la informacion del codigo postal");
+                 }
+             });
+        }
+
+
+
+
+
+        //FUNCTIONS ESTRUCTURA
+        function openModalEstructura(idArea) {
+          $('#ModalEstructuraEmpresa').modal('show');
+        }
+
+
+        function EditArea(idArea) {
+                $.ajax({
+                    url: "@Url.Action("GetArea", "Empresa")",
+                    data: { id_area: idArea },
+                    success: function (data) {
+                        $("#Id_area").val(data.area.Id_area);
+                        $("#Nombre_area").val(data.area.Nombre_area);
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        toastr.error("Error consultar el registro");
+                    }
+                 });
+
+        }
+
+        function DeleteArea(idArea) {
+            alertify.confirm('Eliminar Area', '¿Seguro que desea eliminar el area?', function () {
+                $.ajax({
+                    url: "@Url.Action("DeleteArea", "Empresa")",
+                    dataType: 'html',
+                    contentType: 'application/json',
+                    data: { id_area: idArea },
+                    success: function () {
+                        tableAreasEmpresa.ajax.reload();
+                        toastr.success("¡Registro eliminado!");
+
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        toastr.error("Error al eliminar el registro");
+                    }
+                 });
+               /* alertify.success('Ok')*/
+            }, function () { alertify.error('Operacion cancelada!') });
+        }
+
+
+         function GetDepartamentosEmpresa(idArea) {
+             $.ajax({
+                 type: 'GET',
+                 url: '@Url.Action("GetDepartamentosempresaInfo", "Empresa")',
+                 contentType: "application/json; charset=utf-8",
+                 data: { idarea: idArea },
+                 dataType: "json",
+                 success: function (data) {
+
+                     var c = '<option value="-1">Seleccione departamento</option>';
+                     for (var i = 0; i < data.oLstDepartamentosempresaInfo.length; i++) {
+                         c += '<option value="' + data.oLstDepartamentosempresaInfo[i].Id_departamento_puesto + '">' + data.oLstDepartamentosempresaInfo[i].Nombre_departamento + '</option>';
+                     }
+                     $("#Id_departamento_puesto").html(c);
+                 },
+                 error: function () {
+                     toastr.error("Error al consultar la informacion de los departamentos");
+                 }
+             });
+        }
+
+
+        function EditDepartamento(idDepartamento) {
+                $.ajax({
+                    url: "@Url.Action("GetDepartamento", "Empresa")",
+                    data: { id_departamento: idDepartamento },
+                    success: function (data) {
+                        $("#Id_departamento").val(data.departamento.Id_departamento);
+                        $("#Id_area_departamento").val(data.departamento.Id_area_departamento);
+                        $("#Nombre_departamento").val(data.departamento.Nombre_departamento);
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        toastr.error("Error consultar el registro");
+                    }
+                 });
+
+        }
+
+        function DeleteDepartamento(idDepartamento) {
+            alertify.confirm('Eliminar Departamento', '¿Seguro que desea eliminar el departamento?', function () {
+                $.ajax({
+                    url: "@Url.Action("DeleteDepartamento", "Empresa")",
+                    dataType: 'html',
+                    contentType: 'application/json',
+                    data: { id_departamento: idDepartamento },
+                    success: function () {
+                        tableDepartamentosEmpresa.ajax.reload();
+                        toastr.success("¡Registro eliminado!");
+
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        toastr.error("Error al eliminar el registro");
+                    }
+                 });
+               /* alertify.success('Ok')*/
+            }, function () { alertify.error('Operacion cancelada!') });
+        }
+
+
+
+        function EditPuesto(idPuesto) {
+                $.ajax({
+                    url: "@Url.Action("GetPuesto", "Empresa")",
+                    data: { id_puesto: idPuesto },
+                    success: function (data) {
+                        $("#Id_puesto").val(data.puesto.Id_puesto);
+                        $("#Id_area_puesto").val(data.puesto.Id_area_puesto);
+                         $.ajax({
+                            type: 'GET',
+                            url: '@Url.Action("GetDepartamentosempresaInfo", "Empresa")',
+                            contentType: "application/json; charset=utf-8",
+                             data: { idarea: data.puesto.Id_area_puesto },
+                            dataType: "json",
+                            success: function (data) {
+
+                                var c;
+                                for (var i = 0; i < data.oLstDepartamentosempresaInfo.length; i++) {
+                                    c += '<option value="' + data.oLstDepartamentosempresaInfo[i].Id_departamento_puesto + '">' + data.oLstDepartamentosempresaInfo[i].Nombre_departamento + '</option>';
+                                }
+                                $("#Id_departamento_puesto").html(c);
+                            },
+                            error: function () {
+                                toastr.error("Error al consultar la informacion de los departamentos");
+                            }
+                        });
+                        $("#Id_departamento_puesto").val(data.puesto.Id_departamento_puesto);
+                        $("#Nombre_puesto").val(data.puesto.Nombre_puesto);
+                        $("#Descripcion_puesto").val(data.puesto.Descripcion_puesto);
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        toastr.error("Error consultar el registro");
+                    }
+                 });
+
+        }
+
+        function DeletePuesto(idPuesto) {
+            alertify.confirm('Eliminar Puesto', '¿Seguro que desea eliminar el puesto?', function () {
+                $.ajax({
+                    url: "@Url.Action("DeletePuesto", "Empresa")",
+                    dataType: 'html',
+                    contentType: 'application/json',
+                    data: { id_puesto: idPuesto },
+                    success: function () {
+                        tablePuestosEmpresa.ajax.reload();
+                        toastr.success("¡Registro eliminado!");
+
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        toastr.error("Error al eliminar el registro");
+                    }
+                 });
+               /* alertify.success('Ok')*/
+            }, function () { alertify.error('Operacion cancelada!') });
+        }
+
+
+
+
+
+
+
+
+
+        //FUNCTIONS CUENTAS BANCARIAS
+        function openModalCuentasBancarias() {
+            $('#ModalCuentasBancariasEmpresa').modal('show');
+        }
+
+        function EditCuentaBancariaEmpresa(idCuentaBancariacliente) {
+              $.ajax({
+                  url: "@Url.Action("GetCuentaBancariaEmpresarial", "Empresa")",
+                  data: { id_cuentabancariacliente: idCuentaBancariacliente },
+                  success: function (data) {
+                      $("#Id_cuentabancariacliente").val(data.cuentabancariaempresarial.Id_cuentabancariacliente);
+                      $("#Idcbancocliente").val(data.cuentabancariaempresarial.Idcbancocliente);
+                      $("#Cuentaotarjeta_cliente").val(data.cuentabancariaempresarial.Cuentaotarjeta_cliente);
+                      $("#Clabe_cliente").val(data.cuentabancariaempresarial.Clabe_cliente);
+                      $("#Idformadepagocliente").val(data.cuentabancariaempresarial.Idformadepagocliente);
+                  },
+                  error: function (jqXHR, textStatus, errorThrown) {
+                      toastr.error("Error consultar el registro");
+                  }
+               });
+
+        }
+
+        function DeleteCuentaBancariaEmpresa(idCuentaBancariacliente) {
+            alertify.confirm('Eliminar cuenta bancaria', '¿Seguro que desea eliminar la cuenta bancaria empresarial?', function () {
+                $.ajax({
+                    url: "@Url.Action("DeleteCuentaBancariaEmpresarial", "Empresa")",
+                    dataType: 'html',
+                    contentType: 'application/json',
+                    data: { id_cuentabancariacliente: idCuentaBancariacliente }
+,
+                    success: function () {
+                        tableCuentasBancariasEmpresa.ajax.reload();
+                        toastr.success("¡Registro eliminado!");
+
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        toastr.error("Error al eliminar el registro");
+                    }
+                 });
+               /* alertify.success('Ok')*/
+            }, function () { alertify.error('Operacion cancelada!') });
+        }
+
+
+
+
+
+        function ShowMessage(MessageText) {
+            toastr.success(MessageText);
+             //window.location = '@Url.Action("Index", "Home")';
+        }
+
+    </script>
+}

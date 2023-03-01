@@ -1,0 +1,612 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_VCShared.cshtml";
+}
+
+
+<div class="wrapper fade-in">
+    <div id="main">
+
+        <section>
+            <nav class="navbar navbar-expand-xl navbar-expand-lg navbar-expand-md navbar-expand-sm">
+                <h3 class="ml-auto">CLIENTES</h3>
+            </nav>
+            <!-- SPACER DASHED-->
+            <hr class="dashed" />
+
+        </section>
+        <div class="col-12">
+            @*<form method="post" action="" id="form1">*@
+            <div class="row">
+                <!-- Card Body -->
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="display compact nowrap roundcornersgv nowrap" id="tableClientesList" style="width:100%; font-size:12px;">
+                            <thead>
+                                <tr>
+                                    <td></td>
+                                    <th>NO. SOCIO</th>
+                                    <th>NOMBRE</th>
+                                    <th>TELEFONO</th>
+                                    <th>EMAIL</th>
+                                    <th>BONO</th>
+                                    <th>CANTIDAD BONOS</th>
+                                    <th>% SANCION</th>
+                                    <th>FECHA ALTA</th>
+                                    <th>STATUS</th>
+                                    <td style="text-align:center;">Acciones</td>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            @*</form>*@
+        </div>
+    </div>
+
+    <div id="main" class="mt-5">
+
+        <section>
+            <nav class="navbar navbar-expand-xl navbar-expand-lg navbar-expand-md navbar-expand-sm">
+                <h3 class="ml-auto">PEDIDOS CLIENTES</h3>
+            </nav>
+            <!-- SPACER DASHED-->
+            <hr class="dashed" />
+
+        </section>
+        <div class="col-12">
+            @*<form method="post" action="" id="form1">*@
+            <div class="row">
+                <!-- Card Body -->
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="display compact nowrap roundcornersgv nowrap" id="tablePedidosClientesList" style="width:100%; font-size:12px;">
+                            <thead>
+                                <tr>
+                                    <td></td>
+                                    <th>NO. SOCIO</th>
+                                    <th>TITULO</th>
+                                    <th>CLASIFICACION</th>
+                                    <th>FOLIO</th>
+                                    <th>TIPO TRANSACCION</th>
+                                    <th>CANTIDAD</th>
+                                    <th>FECHA INICIO</th>
+                                    <th>FECHA FIN</th>
+                                    <th>TOTAL</th>
+                                    <td style="text-align:center;">Acciones</td>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            @*</form>*@
+        </div>
+    </div>
+</div>
+
+@Html.Partial("ModalClientes")
+@Html.Partial("ModalPedidosClientes")
+
+
+
+@section Scripts{
+    <script>
+        $(function () {
+            try {
+
+                objClientes.Controles();
+                objClientes.Eventos();
+
+            } catch (error) {
+                toastr.error("Ocurrió un error: " + error + " Si el problema, persiste contactar al equipo de soporte.");
+            }
+
+        });
+
+         $(document).ready(function () {
+             try {
+                 var diasBono;
+                 var costoPeliculaXDia;
+                 var totalPeliculas;
+
+
+             } catch (error) {
+                 toastr.error("Ocurrió un error: " + error + " Si el problema, persiste contactar al equipo de soporte.");
+             }
+         });
+
+        var objClientes = {
+            Controles: function () {
+
+                $("#FechaInicio").datepicker({ /*Se creo este archivo "jquery.validate.date.js" por que a veces en CHROME no detecta bien la fecha selecionada con Jquery UI Datepicker*/
+                    autoSize: true,
+                    dateFormat: "dd/mm/yy",
+                    changeYear: true,
+                    changeMonth: true,
+                    /* maxDate: "+0d",*/
+                    showAnim: "fade",
+                    autoClose: true,
+                    yearRange: "-00:+00",
+                    onSelect: function (selectedDate) {
+                        if ($("#IdTipoTransaccion").val() == 2) {
+                            $.ajax({
+                                type: 'GET',
+                                url: '@Url.Action("GetClienteInfo", "Clientes")',
+                                contentType: "application/json; charset=utf-8",
+                                dataType: "json",
+                                data: { idCliente: $("#IdCliente_Pedido").val(), fechaStart: selectedDate },
+                                success: function (data) {
+                                    diasBono = data.oLstInfoCliente[0].DiasBono
+                                    toastr.info("La transaccion solo durara " + data.oLstInfoCliente[0].DiasBono + " dia(s),debido al tipo de bono.")
+
+                                },
+                                error: function () {
+                                    toastr.error("Error al consultar la informacion de la suscripcion del cliente");
+                                }
+                            });
+                        }
+                    },
+                    beforeShow: function (input, obj) {
+                        $(input).after($(input).datepicker('widget'));
+                    }
+                });
+
+                $("#TotalPeliculas").val("0.00");
+
+                tableClientesList = $('#tableClientesList').DataTable({
+                    deferRender: true,
+                    responsive: true,
+                    order: [[1, 'asc']],
+                    pageLength: 10,
+                    responsive: true,
+                    pagingType: "simple_numbers",
+                    fixedColumns: true,
+
+                    ajax: {
+                        url: "@Url.Action("ShowGridClientes", "Clientes")",
+                        data: {},
+                        type: "GET",
+                        datatype: "json"
+                    },
+                    columns: [
+                        {
+                            "data": "IdCliente",
+                            "defaultContent": "",
+                            "visible": false
+                        },
+                        { "data": "NumSocio", "visible": true, "defaultContent": "" },
+                        { "data": "NombreCliente", "visible": true, "defaultContent": "" },
+                        { "data": "TelefonoCliente", "visible": true, "defaultContent": "" },
+                        { "data": "EmailCliente", "visible": true, "defaultContent": "" },
+                        { "data": "DescripcionBono", "visible": true, "defaultContent": "" },
+                        { "data": "NumBonos", "visible": true, "defaultContent": "" },
+                        { "data": "PorcentajeSancion", "visible": true, "defaultContent": "" },
+                        {
+                            "data": "FG", "visible": true, "render": function (d) {
+                                return moment(d).format('DD/MM/YYYY');
+                            }, "defaultContent": ""
+                        },
+                        {
+                            "data": "StatusCliente", "visible": true, "defaultContent": "", "render": function (row,data) {
+                                /*debugger;*/
+                                if (row == false) {
+                                    return "Inactivo"
+                                }
+                                else if (row == true) {
+                                    return "Activo"
+                                }
+                            },
+                        },
+                        {
+                            "data": "IdCliente", "render": function (data) {
+                                return "<a id='btndeletecliente' class='btn btn-outline-danger btn-sm ml-3' onclick='DeleteCliente(" + data + ")' title='Eliminar cliente'><i class='fa fa-trash'></i></a>" +
+                                    "<a id='btneditcliente' class='btn btn-outline-warning btn-sm ml-1 mr-1' title='Editar cliente' onclick='openModalCliente(" + data + ")'><i class='fa fa-pencil'></i></a>"
+                            },
+                            "className": "text-right",
+                            "orderable": false,
+                            "searchable": false,
+                            "width": "150px"
+                        }
+                    ],
+                    ordering: true,
+                    select: false,
+                    searching: true, // ocultar busqueda
+                    lengthChange: false, // ocultar parte superior izquierda
+                    dom: 'Bfrtip', // Oculta el boton de exportar en csv
+                    buttons: [
+                        {
+                            text: '<i class="fa fa-fw fa-user-plus"></i> Alta Cliente',
+                           /* text: 'Alta empresa',*/
+                            attr: { class: 'btn btn-success btn-sm mb-4 mr-4' },
+                            titleAttr: 'Alta Cliente',
+                            action: function (e, dt, node, config) {
+                                openModalCliente(0);
+                            }
+                        },
+                        {
+                            extend: 'spacer',
+                            /*style: 'bar',*/
+                            text: '',
+                            /*attr: { class: 'mb-4' }*/
+                        },
+
+                        {
+                            text: '<i class="fa fa-cloud-download"></i> Exportar',
+                            attr: { class: 'btn btn-outline-secondary btn-sm mb-4 text-right' },
+                            titleAttr: 'Exportar',
+                            action: function (e, dt, node, config) {
+
+                            }
+                        },
+                        {
+                            text: '<i class="fa fa-cloud-upload"></i> Importar',
+                            attr: { class: 'btn btn-outline-secondary btn-sm mb-4 text-right' },
+                            titleAttr: 'Importar',
+                            action: function (e, dt, node, config) {
+
+                            }
+                        },
+                    ],
+                    language: {
+                        emptyTable: "",
+                        info: " ",
+                        url: "@Url.Content("~/Content/DataTables/idioma/datatable.es-ES.json")"
+                    }
+                });
+
+
+
+                tablePedidosClientesList = $('#tablePedidosClientesList').DataTable({
+                    deferRender: true,
+                    responsive: true,
+                    order: [[1, 'asc']],
+                    pageLength: 10,
+                    responsive: true,
+                    pagingType: "simple_numbers",
+                    fixedColumns: true,
+
+                    ajax: {
+                        url: "@Url.Action("ShowGridPedidosClientes", "Clientes")",
+                        data: {},
+                        type: "GET",
+                        datatype: "json"
+                    },
+                    columns: [
+                        {
+                            "data": "IdPedidoCliente",
+                            "defaultContent": "",
+                            "visible": false
+                        },
+                        { "data": "NumSocio", "visible": true, "defaultContent": "" },
+                        { "data": "TituloPelicula", "visible": true, "defaultContent": "" },
+                        { "data": "ClasificacionPelicula", "visible": true, "defaultContent": "" },
+                        { "data": "FolioPelicula", "visible": true, "defaultContent": "" },
+                        { "data": "TipoTransacciones", "visible": true, "defaultContent": "" },
+                        { "data": "CantidadPeliculas", "visible": true, "defaultContent": "" },
+                        {
+                            "data": "FechaInicio", "visible": true, "render": function (d) {
+                                return moment(d).format('DD/MM/YYYY');
+                            }, "defaultContent": ""
+                        },
+                        {
+                            "data": "FechaFinalizacion", "visible": true, "render": function (d) {
+                                return moment(d).format('DD/MM/YYYY');
+                            }, "defaultContent": ""
+                        },
+                        { "data": "TotalPeliculas", "visible": true, render: $.fn.dataTable.render.number('\,', '.', 2, '$ '), "defaultContent": "" },
+                        {
+                            "data": "IdCliente", "render": function (data) {
+                                return
+                                    "<a id='btndeletecliente' class='btn btn-outline-danger btn-sm ml-3' onclick='DeletePedidoCliente(" + data + ")' title='Eliminar empresa'><i class='fa fa-trash'></i></a>" +
+                                    "<a id='btneditcliente' class='btn btn-outline-warning btn-sm ml-1 mr-1' title='Editar empresa' onclick='openModalTransacciones(" + data + ")'><i class='fa fa-pencil'></i></a>"
+                            },
+                            "className": "text-right",
+                            "orderable": false,
+                            "searchable": false,
+                            "width": "150px"
+                        }
+
+                    ],
+
+                    ordering: true,
+                    select: false,
+                    searching: true, // ocultar busqueda
+                    lengthChange: false, // ocultar parte superior izquierda
+                    dom: 'Bfrtip', // Oculta el boton de exportar en csv
+                    buttons: [
+                        {
+                            text: '<i class="fa fa-fw fa-user-plus"></i> Alta Pedido',
+                           /* text: 'Alta empresa',*/
+                            attr: { class: 'btn btn-success btn-sm mb-4 mr-4' },
+                            titleAttr: 'Alta Pedido',
+                            action: function (e, dt, node, config) {
+                                openModalPedidosCliente(0);
+                            }
+                            //action: function (e, dt, node, config) {
+                            //    alert('Activated!');
+                            //    this.disable(); // disable button
+                            //}
+                        },
+                        {
+                            extend: 'spacer',
+                            /*style: 'bar',*/
+                            text: '',
+                            /*attr: { class: 'mb-4' }*/
+                        },
+
+                        {
+                            text: '<i class="fa fa-cloud-download"></i> Exportar',
+                            attr: { class: 'btn btn-outline-secondary btn-sm mb-4 text-right' },
+                            titleAttr: 'Exportar',
+                            action: function (e, dt, node, config) {
+
+                            }
+                        },
+                        {
+                            text: '<i class="fa fa-cloud-upload"></i> Importar',
+                            attr: { class: 'btn btn-outline-secondary btn-sm mb-4 text-right' },
+                            titleAttr: 'Importar',
+                            action: function (e, dt, node, config) {
+
+                            }
+                        },
+                    ],
+                    language: {
+                        emptyTable: "",
+                        info: " ",
+                        url: "@Url.Content("~/Content/DataTables/idioma/datatable.es-ES.json")"
+                    }
+                });
+            },
+            Eventos: function () {
+                $("#NumSocio").keypress(function (event) {
+                    if ((event.which != 46 || $(this).val().indexOf('.') != -1) && (event.which < 48 || event.which > 57)) {
+                        event.preventDefault();
+                    }
+                });
+                $("#TelefonoCliente").keypress(function (event) {
+                    if ((event.which != 46 || $(this).val().indexOf('.') != -1) && (event.which < 48 || event.which > 57)) {
+                        event.preventDefault();
+                    }
+                });
+                $("#NumBonos").keypress(function (event) {
+                    if ((event.which != 46 || $(this).val().indexOf('.') != -1) && (event.which < 48 || event.which > 57)) {
+                        event.preventDefault();
+                    }
+                });
+
+
+                $("#CantidadPeliculas").keypress(function (evt) {
+                    // Only ASCII character in that range allowed
+                    var ASCIICode = (evt.which) ? evt.which : evt.keyCode
+                    if (ASCIICode > 31 && (ASCIICode < 48 || ASCIICode > 57))
+                        return false;
+                    return true;
+                });
+
+                $("#CantidadPeliculas").on("change", function () {
+                    totalPeliculas = costoPeliculaXDia * diasBono * $("#CantidadPeliculas").val();                   
+                    $("#TotalPeliculas").val(totalPeliculas.toFixed(2))
+                });
+
+                $("#IdPelicula").on("change", function () {
+                    $.ajax({
+                        type: 'GET',
+                        url: '@Url.Action("GetPeliculaInfo", "Clientes")',
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        data: { idPelicula: $("#IdPelicula").val() },
+                        success: function (data) {
+                            costoPeliculaXDia = data.oLstInfoPelicula[0].PrecioXDia                          
+                        },
+                        error: function () {
+                            toastr.error("Error al consultar la informacion de la suscripcion del cliente");
+                        }
+                    });
+                });
+
+
+
+                $("#SaveCliente").on('click', function (e) {
+                    if ($('#NumSocio').val().length > 0 && $('#NombreCliente').val().length > 0 && $('#ApellidoPaternoCliente').val().length > 0 && $('#ApellidoMaternoCliente').val().length > 0 && $('#TelefonoCliente').val().length > 0 &&
+                        $('#EmailCliente').val().length > 0 && $('#IdBonos').val().length > 0 && $('#NumBonos').val().length > 0 && $('#PorcentajeSancion').val().length > 0 && $('#StatusCliente').val().length > 0) {
+                        let data = $("#clientesform").serialize(); // or use the id of the form is you have given it one or .form for all forms      /*Doesnt work with files upload input*/
+
+                        //verify if exists
+                        $.ajax({
+                            url: "@Url.Action("SaveCliente", "Clientes")",
+                            dataType: 'json',
+                            contentType: 'application/json',
+                            data: data,
+                            success: function () {
+                                $("#clientesform").find('input:text, input:password, input:file, select, textarea').val(''); //Limpia elementos en el form
+                                $("#clientesform").find('input:radio, input:checkbox').prop('checked', false).prop('selected', false); //Limpia los checkbnos en el form
+                                tableClientesList.ajax.reload(); //Recarga el Datatable
+                                $('#ModalClientes').modal('toggle'); //Cierra modal
+                                toastr.success("Alta de cliente exitosa");
+                                //Actualiza el DDL en Clientes - PEDIDOS
+                                $.ajax({
+                                    type: 'GET',
+                                    url: '@Url.Action("GetRegistroPatronalInfo", "Empresa")',
+                                    contentType: "application/json; charset=utf-8",
+                                    dataType: "json",
+                                    success: function (data) {
+                                        var c = '<option value="-1">Seleccione el registro patronal</option>';
+                                        for (var i = 0; i < data.oLstInfoRegistrosPatronales.length; i++) {
+                                            c += '<option value="' + data.oLstInfoRegistrosPatronales[i].Id_regpatronalimss + '">' + data.oLstInfoRegistrosPatronales[i].Numero_regpatronalimss + '</option>';
+                                        }
+                                        $("#Idregpatronalimss").html(c);
+                                    },
+                                    error: function () {
+                                        toastr.error("Error al consultar la informacion de los registros patronales");
+                                    }
+                                });
+                            },
+                            error: function (jqXHR, textStatus, errorThrown) {
+                                toastr.error("Error al dar de alta la empresa");
+                            }
+                        });
+                } else {
+                    toastr.warning("Faltan datos obligatorios (*)");
+                }
+                });
+
+                $("#SavePedidoCliente").on('click', function (e) {
+                    if ($('#IdCliente_Pedido').val().length > 0 && $('#IdTipoTransaccion').val().length > 0 && $('#IdPelicula').val().length > 0 && $('#CantidadPeliculas').val().length > 0 && $('#FechaInicio').val().length > 0) {
+                        let data = $("#pedidosclientesform").serialize(); // or use the id of the form is you have given it one or .form for all forms      /*Doesnt work with files upload input*/
+                       
+                        $.ajax({
+                            url: "@Url.Action("SavePedidoCliente", "Clientes")",
+                            dataType: 'json',
+                            contentType: 'application/json',                           
+                              data: { data, diasBono:diasBono },
+                           /* data: data,*/
+                            success: function () {
+                                $("#pedidosclientesform").find('input:text, input:password, input:file, select, textarea').val(''); //Limpia elementos en el form
+                                $("#pedidosclientesform").find('input:radio, input:checkbox').prop('checked', false).prop('selected', false); //Limpia los checkbnos en el form
+                                tablePedidosClientesList.ajax.reload(); //Recarga el Datatable
+                                $('#ModalPedidosClientes').modal('toggle'); //Cierra modal
+                                toastr.success("Alta de pedido del cliente exitoso");
+                            },
+                            error: function (jqXHR, textStatus, errorThrown) {
+                                toastr.error("Error al dar de alta el pedido del cliente");
+                            }
+                        });
+                } else {
+                    toastr.warning("Faltan datos obligatorios (*)");
+                }
+            });
+
+
+            }
+        }
+
+
+
+        function openModalCliente(IdCliente) {
+             $("#Id_cliente").val(IdCliente);
+            if (IdCliente != 0) {
+                $.ajax({
+                    url: "@Url.Action("GetCliente", "Clientes")",
+                    data: { idCliente: IdCliente },
+                    success: function (data) {
+                        if (data != null) {
+                            $("#IdCliente").val(data.cliente.IdCliente);
+                            $("#NumSocio").val(data.cliente.NumSocio);
+                            $("#NombreCliente").val(data.cliente.NombreCliente);
+                            $("#ApellidoPaternoCliente").val(data.cliente.ApellidoPaternoCliente);
+                            $("#ApellidoMaternoCliente").val(data.cliente.ApellidoMaternoCliente);
+                            $("#TelefonoCliente").val(data.cliente.TelefonoCliente);
+                            $("#EmailCliente").val(data.cliente.EmailCliente);
+                            $("#IdBonos").val(data.cliente.IdBonos);
+                            $("#NumBonos").val(data.cliente.NumBonos);
+                            $("#PorcentajeSancion").val(data.cliente.PorcentajeSancion);
+                            $('#StatusCliente').val(data.cliente.StatusCliente)
+                            $('#ModalClientes').modal('show');
+                        }
+                    }
+                });
+            } else {
+                $("#IdCliente").val("");
+                $("#NumSocio").val("");
+                $("#NombreCliente").val("");
+                $("#ApellidoPaternoCliente").val("");
+                $("#ApellidoMaternoCliente").val("");
+                $("#TelefonoCliente").val("");
+                $("#EmailCliente").val("");
+                $("#IdBonos").val("");
+                $("#NumBonos").val("");
+                $("#PorcentajeSancion").val("");
+                $('#StatusCliente').val("");
+                $('#ModalClientes').modal('show');
+            }
+        }
+
+        function DeleteCliente(IdCliente) {
+            alertify.confirm('Eliminar cliente', '¿Seguro que desea eliminar al cliente?', function () {
+                $.ajax({
+                    url: "@Url.Action("DeleteCliente", "Clientes")",
+                    dataType: 'html',
+                    contentType: 'application/json',
+                    data: { idCliente: IdCliente },
+                    success: function () {
+                        tableClientesList.ajax.reload();
+                        toastr.success("¡Cliente eliminado correctamente!");
+
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        toastr.error("Error al eliminar la empresa");
+                    }
+                 });
+            }, function () { alertify.error('Operacion cancelada!') });
+        }
+
+
+
+
+
+
+
+
+        function openModalPedidosCliente(IdPedidoCliente) {
+            $("#IdPedidoCliente").val(IdPedidoCliente);
+            if (IdPedidoCliente != 0) {
+                $.ajax({
+                    url: "@Url.Action("Getcliente", "Empresa")",
+                    data: { idPedidoCliente: IdPedidoCliente },
+                    success: function (data) {
+                        if (data != null) {
+                            $("#IdPedidoCliente").val(data.pedidoscliente.IdPedidoCliente);
+                            $("#IdCliente").val(data.pedidoscliente.Razonsocial);
+                            $("#IdTipoTransaccion").val(data.pedidoscliente.Nombreempresa);
+                            $("#IdPelicula").val(data.pedidoscliente.Rfcempr);
+                            $("#CantidadPeliculas").val(data.pedidoscliente.Reginfonavit);
+                            $("#FechaInicio").val(moment(data.pedidoscliente.Fechaconstitucion).format('DD/MM/YYYY'));
+                            $("#FechaFinalizacion").val(moment(data.pedidoscliente.Fechaconstitucion).format('DD/MM/YYYY'));
+                            $('#ModalPedidosClientes').modal('show');
+                        }
+                    }
+                });
+            } else {
+                $("#IdPedidoCliente").val("");
+                $("#IdCliente").val("");
+                $("#IdTipoTransaccion").val("");
+                $("#IdPelicula").val("");
+                $("#CantidadPeliculas").val("");
+                $("#Regfonacot").val("");
+                $("#FechaInicio").val("");
+                $("#FechaFinalizacion").val("");
+                $('#ModalPedidosClientes').modal('show');
+            }
+        }
+
+
+        function DeletePedidoCliente(IdCliente) {
+            alertify.confirm('Eliminarpedido cliente', '¿Seguro que desea eliminar el pedido del cliente?', function () {
+                $.ajax({
+                    url: "@Url.Action("DeleteCompany", "Empresa")",
+                    dataType: 'html',
+                    contentType: 'application/json',
+                    data: { idCliente: IdCliente },
+                    success: function () {
+                        tableClientesList.ajax.reload();
+                        toastr.success("¡Pedido del cliente eliminado correctamente!");
+
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        toastr.error("Error al eliminar el pedido del cliente");
+                    }
+                 });
+            }, function () { alertify.error('Operacion cancelada!') });
+        }
+
+
+
+
+
+
+    </script>
+}

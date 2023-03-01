@@ -1,0 +1,89 @@
+﻿
+@model VideoClubALFA.Models.PedidosClientes
+
+
+<div class="modal fade" id="ModalPedidosClientes" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content modal-xl">
+            <div class="modal-header">
+                <h5 class="modal-title">PEDIDOS CLIENTES</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body fade-in">
+
+                @using (Html.BeginForm("", "", FormMethod.Post, new { id = "pedidosclientesform", enctype = "multipart/form-data" }))
+                {
+                  
+                  <div class="row mt-1 mb-4">
+                    <h4>DATOS GENERALES DEL CLIENTE</h4>
+
+                    <div class="row">
+                        <div class="col-sm-3">
+                            @Html.HiddenFor(model => model.IdPedidoCliente)
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.IdCliente, "CLIENTE (SOCIO)*", htmlAttributes: new { @class = "control-label", @style = "font-size: 12px;" })
+                                @Html.DropDownList("IdCliente_Pedido", ViewBag.ClientesSelectList as SelectList, "Seleccione cliente", new { @class = "form-control form-control-sm" })
+                                @Html.ValidationMessageFor(model => model.IdCliente, "", new { @class = "error" })
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.IdTipoTransaccion, "TRANSACCION*", htmlAttributes: new { @class = "control-label", @style = "font-size: 12px;" })
+                                @Html.DropDownList("IdTipoTransaccion", ViewBag.TipoTransaccionSelectList as SelectList, "Seleccione tipo transaccion", new { @class = "form-control form-control-sm" })
+                                @Html.ValidationMessageFor(model => model.IdTipoTransaccion, "", new { @class = "error" })
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.IdPelicula, "PELICULA*", htmlAttributes: new { @class = "control-label", @style = "font-size: 12px;" })
+                                @Html.DropDownList("IdPelicula", ViewBag.PeliculasSelectList as SelectList, "Seleccione pelicula", new { @class = "form-control form-control-sm" })
+                                @Html.ValidationMessageFor(model => model.IdPelicula, "", new { @class = "error" })
+                            </div>
+                        </div>
+                        <div class="col-sm-2">
+                            <div class="input-group">
+                                @Html.LabelFor(model => model.FechaInicio, "FECHA INICIO*", htmlAttributes: new { @class = "control-label", @style = "font-size: 12px;" })@*<i class="date-icon fa fa-calendar" aria-hidden="true"></i>*@
+                                <span class="input-group-btn ml-2 fa fa-calendar fa-1x"></span>
+                            </div>
+                            @Html.TextBoxFor(model => model.FechaInicio, "{0:dd/MM/yyyy}", new { @type = "text", @class = "form-control form-control-sm", @style = "width:100px", @placeholder = "dd/MM/yyyy", @readonly = "true" })
+                            @Html.ValidationMessageFor(model => model.FechaInicio, "", new { @class = "error" })
+                        </div>                       
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-sm-2">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.CantidadPeliculas, "CANTIDAD*", htmlAttributes: new { @class = "control-label", @style = "font-size: 12px;" })
+                                @Html.TextBoxFor(model => model.CantidadPeliculas, new { @class = "form-control form-control-sm", @maxlength = "255" })
+                                @Html.ValidationMessageFor(model => model.CantidadPeliculas, "", new { @class = "error" })
+                            </div>
+                        </div>
+                        <div class="col-sm-2">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.TotalPeliculas, "TOTAL*", htmlAttributes: new { @class = "control-label", @style = "font-size: 12px;" })
+                                @Html.TextBoxFor(model => model.TotalPeliculas, new { @class = "form-control form-control-sm", @maxlength = "255", @readonly = "readonly" })
+                                @Html.ValidationMessageFor(model => model.TotalPeliculas, "", new { @class = "error" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer mt-4">
+                        <div class="col-sm-12 text-left">
+                            <small><span class="error" style="color:red;">obligatorio(*)</span></small>
+                            <br />
+                            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                        </div>
+                        <button type="button" class="btn btn-danger btn-sm" data-bs-dismiss="modal" aria-label="Close">Cerrar</button>
+                        <button type="reset" class="btn btn-outline-warning btn-sm">Reset</button>
+                        <button id="SavePedidoCliente" type="button" class="btn btn-success btn-sm">Guardar</button>
+
+                    </div>
+                   </div>
+
+                 }
+              
+            </div>
+        </div>
+    </div>
+</div>
+
