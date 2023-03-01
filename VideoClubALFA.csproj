@@ -732,6 +732,7 @@
     <Content Include="Content\font-awesome-4.7.0\scss\_variables.scss" />
     <Content Include="Scripts\DataTables\Buttons\css\common.scss" />
     <Content Include="Scripts\DataTables\Buttons\css\mixins.scss" />
+    <Content Include="DB\VideClubDB.bak" />
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <Content Include="Scripts\DataTables\autoFill.bootstrap.js" />
     <Content Include="Scripts\DataTables\autoFill.bootstrap.min.js" />

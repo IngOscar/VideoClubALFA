@@ -29,7 +29,7 @@ namespace VideoClubALFA.Controllers
         }
 
 
-        #region clientes
+        #region CLIENTES
         public ActionResult ShowGridClientes()
         {
             List<Clientes> oListClientes= new List<Clientes>();
