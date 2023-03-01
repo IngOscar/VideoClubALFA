@@ -684,6 +684,7 @@
     <Content Include="Content\themes\vader\jquery-ui.min.css" />
     <Content Include="Content\themes\vader\theme.css" />
     <Content Include="Content\toastr.css" />
+    <Content Include="Diagram\Video Club ALFA.jpg" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
@@ -733,6 +734,7 @@
     <Content Include="Scripts\DataTables\Buttons\css\common.scss" />
     <Content Include="Scripts\DataTables\Buttons\css\mixins.scss" />
     <Content Include="DB\VideClubDB.bak" />
+    <Content Include="Diagram\Video Club ALFA.vsdx" />
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <Content Include="Scripts\DataTables\autoFill.bootstrap.js" />
     <Content Include="Scripts\DataTables\autoFill.bootstrap.min.js" />
