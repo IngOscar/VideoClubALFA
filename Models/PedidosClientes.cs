@@ -12,6 +12,7 @@ namespace VideoClubALFA.Models
         public int? IdPedidoCliente { get; set; }
 
         public int IdCliente { get; set; }
+        public int IdCliente_Pedido { get; set; }
 
         public int IdPelicula { get; set; }
 
@@ -26,6 +27,14 @@ namespace VideoClubALFA.Models
         public DateTime FechaFinalizacion { get; set; }
 
         public decimal TotalPeliculas { get; set; }
+        public int DiasBono { get; set; }
+        public int IdStatusPedido { get; set; }
+        public string NumSocio { get; set; }
+        public string TituloPelicula { get; set; }
+        public string ClasificacionPelicula { get; set; }
+        public string FolioPelicula { get; set; }
+        public string TipoTransaccion { get; set; }
+        public string DescripcionStatusPedido { get; set; }
 
         public DateTime FG { get; set; }
 

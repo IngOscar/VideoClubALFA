@@ -22,10 +22,11 @@
                     <div class="row">
                         <div class="col-sm-3">
                             @Html.HiddenFor(model => model.IdPedidoCliente)
+                            @Html.HiddenFor(model => model.DiasBono)
                             <div class="form-group">
-                                @Html.LabelFor(model => model.IdCliente, "CLIENTE (SOCIO)*", htmlAttributes: new { @class = "control-label", @style = "font-size: 12px;" })
+                                @Html.LabelFor(model => model.IdCliente_Pedido, "CLIENTE (SOCIO)*", htmlAttributes: new { @class = "control-label", @style = "font-size: 12px;" })
                                 @Html.DropDownList("IdCliente_Pedido", ViewBag.ClientesSelectList as SelectList, "Seleccione cliente", new { @class = "form-control form-control-sm" })
-                                @Html.ValidationMessageFor(model => model.IdCliente, "", new { @class = "error" })
+                                @Html.ValidationMessageFor(model => model.IdCliente_Pedido, "", new { @class = "error" })
                             </div>
                         </div>
                         <div class="col-sm-3">

@@ -75,6 +75,7 @@
                                     <th>FECHA INICIO</th>
                                     <th>FECHA FIN</th>
                                     <th>TOTAL</th>
+                                    <th>STATUS</th>
                                     <td style="text-align:center;">Acciones</td>
                                 </tr>
                             </thead>
@@ -139,7 +140,8 @@
                                 dataType: "json",
                                 data: { idCliente: $("#IdCliente_Pedido").val(), fechaStart: selectedDate },
                                 success: function (data) {
-                                    diasBono = data.oLstInfoCliente[0].DiasBono
+                                    diasBono = data.oLstInfoCliente[0].DiasBono;
+                                    $("#DiasBono").val(diasBono);
                                     toastr.info("La transaccion solo durara " + data.oLstInfoCliente[0].DiasBono + " dia(s),debido al tipo de bono.")
 
                                 },
@@ -284,8 +286,8 @@
                         { "data": "TituloPelicula", "visible": true, "defaultContent": "" },
                         { "data": "ClasificacionPelicula", "visible": true, "defaultContent": "" },
                         { "data": "FolioPelicula", "visible": true, "defaultContent": "" },
-                        { "data": "TipoTransacciones", "visible": true, "defaultContent": "" },
-                        { "data": "CantidadPeliculas", "visible": true, "defaultContent": "" },
+                        { "data": "TipoTransaccion", "visible": true, "defaultContent": "" },
+                        { "data": "CantidadPeliculas", "visible": true, "defaultContent": "" },                       
                         {
                             "data": "FechaInicio", "visible": true, "render": function (d) {
                                 return moment(d).format('DD/MM/YYYY');
@@ -297,18 +299,17 @@
                             }, "defaultContent": ""
                         },
                         { "data": "TotalPeliculas", "visible": true, render: $.fn.dataTable.render.number('\,', '.', 2, '$ '), "defaultContent": "" },
+                        { "data": "DescripcionStatusPedido", "visible": true, "defaultContent": "" },
                         {
-                            "data": "IdCliente", "render": function (data) {
-                                return
-                                    "<a id='btndeletecliente' class='btn btn-outline-danger btn-sm ml-3' onclick='DeletePedidoCliente(" + data + ")' title='Eliminar empresa'><i class='fa fa-trash'></i></a>" +
-                                    "<a id='btneditcliente' class='btn btn-outline-warning btn-sm ml-1 mr-1' title='Editar empresa' onclick='openModalTransacciones(" + data + ")'><i class='fa fa-pencil'></i></a>"
+                            "data": "IdPedidoCliente", "render": function (data) {
+                                return "<a id='btndeletepedidocliente' class='btn btn-outline-danger btn-sm ml-3' onclick='DeletePedidoCliente(" + data + ")' title='Eliminar pedido'><i class='fa fa-trash'></i></a>" +
+                                    "<a id='btneditpedidocliente' class='btn btn-outline-warning btn-sm ml-1 mr-1' title='Editar pedido' onclick='openModalPedidosCliente(" + data + ")'><i class='fa fa-pencil'></i></a>"
                             },
                             "className": "text-right",
                             "orderable": false,
                             "searchable": false,
                             "width": "150px"
                         }
-
                     ],
 
                     ordering: true,
@@ -389,7 +390,7 @@
 
                 $("#CantidadPeliculas").on("change", function () {
                     totalPeliculas = costoPeliculaXDia * diasBono * $("#CantidadPeliculas").val();                   
-                    $("#TotalPeliculas").val(totalPeliculas.toFixed(2))
+                    $("#TotalPeliculas").val(totalPeliculas.toFixed(2))                    
                 });
 
                 $("#IdPelicula").on("change", function () {
@@ -461,9 +462,10 @@
                         $.ajax({
                             url: "@Url.Action("SavePedidoCliente", "Clientes")",
                             dataType: 'json',
-                            contentType: 'application/json',                           
-                              data: { data, diasBono:diasBono },
-                           /* data: data,*/
+                            contentType: 'application/json',
+                            //dataType: 'html',
+                            //contentType: 'application/json',                       
+                              data: data,                          
                             success: function () {
                                 $("#pedidosclientesform").find('input:text, input:password, input:file, select, textarea').val(''); //Limpia elementos en el form
                                 $("#pedidosclientesform").find('input:radio, input:checkbox').prop('checked', false).prop('selected', false); //Limpia los checkbnos en el form
@@ -555,23 +557,26 @@
             $("#IdPedidoCliente").val(IdPedidoCliente);
             if (IdPedidoCliente != 0) {
                 $.ajax({
-                    url: "@Url.Action("Getcliente", "Empresa")",
+                    url: "@Url.Action("GetPedidoCliente", "Clientes")",
                     data: { idPedidoCliente: IdPedidoCliente },
                     success: function (data) {
                         if (data != null) {
                             $("#IdPedidoCliente").val(data.pedidoscliente.IdPedidoCliente);
-                            $("#IdCliente").val(data.pedidoscliente.Razonsocial);
-                            $("#IdTipoTransaccion").val(data.pedidoscliente.Nombreempresa);
-                            $("#IdPelicula").val(data.pedidoscliente.Rfcempr);
-                            $("#CantidadPeliculas").val(data.pedidoscliente.Reginfonavit);
-                            $("#FechaInicio").val(moment(data.pedidoscliente.Fechaconstitucion).format('DD/MM/YYYY'));
-                            $("#FechaFinalizacion").val(moment(data.pedidoscliente.Fechaconstitucion).format('DD/MM/YYYY'));
+                            $("#DiasBono").val(data.pedidoscliente.DiasBono);
+                            $("#IdCliente_Pedido").val(data.pedidoscliente.IdCliente);
+                            $("#IdTipoTransaccion").val(data.pedidoscliente.IdTipoTransaccion);
+                            $("#IdPelicula").val(data.pedidoscliente.IdPelicula);
+                            $("#CantidadPeliculas").val(data.pedidoscliente.CantidadPeliculas);
+                            $("#FechaInicio").val(moment(data.pedidoscliente.FechaInicio).format('DD/MM/YYYY'));
+                            $("#FechaFinalizacion").val(moment(data.pedidoscliente.FechaFinalizacion).format('DD/MM/YYYY'));
+                            $("#TotalPeliculas").val(data.pedidoscliente.TotalPeliculas);
                             $('#ModalPedidosClientes').modal('show');
                         }
                     }
                 });
             } else {
                 $("#IdPedidoCliente").val("");
+                $("#DiasBono").val("");
                 $("#IdCliente").val("");
                 $("#IdTipoTransaccion").val("");
                 $("#IdPelicula").val("");
@@ -579,20 +584,21 @@
                 $("#Regfonacot").val("");
                 $("#FechaInicio").val("");
                 $("#FechaFinalizacion").val("");
+                $("#TotalPeliculas").val("0.00");
                 $('#ModalPedidosClientes').modal('show');
             }
         }
 
 
-        function DeletePedidoCliente(IdCliente) {
-            alertify.confirm('Eliminarpedido cliente', '¿Seguro que desea eliminar el pedido del cliente?', function () {
+        function DeletePedidoCliente(IdPedidoCliente) {
+            alertify.confirm('Eliminar pedido cliente', '¿Seguro que desea eliminar el pedido del cliente?', function () {
                 $.ajax({
-                    url: "@Url.Action("DeleteCompany", "Empresa")",
+                    url: "@Url.Action("DeletePedidoCliente", "Clientes")",
                     dataType: 'html',
                     contentType: 'application/json',
-                    data: { idCliente: IdCliente },
+                    data: { idPedidoCliente: IdPedidoCliente },
                     success: function () {
-                        tableClientesList.ajax.reload();
+                        tablePedidosClientesList.ajax.reload();
                         toastr.success("¡Pedido del cliente eliminado correctamente!");
 
                     },

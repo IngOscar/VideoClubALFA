@@ -326,15 +326,16 @@ namespace VideoClubALFA.Controllers
                                 {
                                     PedidosClientes pedidosclientesList = new PedidosClientes();
                                     pedidosclientesList.IdPedidoCliente = Convert.ToInt32(dtQueryListResult.Rows[i]["idPedidoCliente"]);
-                                    pedidosclientesList.Clientes.NumSocio = dtQueryListResult.Rows[i]["numSocio"].ToString().Trim();
-                                    pedidosclientesList.Peliculas.TituloPelicula = dtQueryListResult.Rows[i]["tituloPelicula"].ToString().Trim();
-                                    pedidosclientesList.Peliculas.ClasificacionPelicula = dtQueryListResult.Rows[i]["clasificacionPelicula"].ToString().Trim();
-                                    pedidosclientesList.Peliculas.FolioPelicula = dtQueryListResult.Rows[i]["folioPelicula"].ToString().Trim();
-                                    pedidosclientesList.TipoTransacciones.TipoTransaccion = dtQueryListResult.Rows[i]["tipoTransaccion"].ToString().Trim();
+                                    pedidosclientesList.NumSocio = dtQueryListResult.Rows[i]["numSocio"].ToString().Trim();
+                                    pedidosclientesList.TituloPelicula = dtQueryListResult.Rows[i]["tituloPelicula"].ToString().Trim();
+                                    pedidosclientesList.ClasificacionPelicula = dtQueryListResult.Rows[i]["clasificacionPelicula"].ToString().Trim();
+                                    pedidosclientesList.FolioPelicula = dtQueryListResult.Rows[i]["folioPelicula"].ToString().Trim();
+                                    pedidosclientesList.TipoTransaccion = dtQueryListResult.Rows[i]["tipoTransaccion"].ToString().Trim();
                                     pedidosclientesList.CantidadPeliculas = Convert.ToInt32(dtQueryListResult.Rows[i]["cantidadPeliculas"]);
                                     pedidosclientesList.FechaInicio = Convert.ToDateTime(dtQueryListResult.Rows[i]["fechaInicio"]);
                                     pedidosclientesList.FechaFinalizacion = Convert.ToDateTime(dtQueryListResult.Rows[i]["fechaFinalizacion"]);
                                     pedidosclientesList.TotalPeliculas = (decimal)dtQueryListResult.Rows[i]["totalPeliculas"];
+                                    pedidosclientesList.DescripcionStatusPedido =dtQueryListResult.Rows[i]["descripcionStatusPedido"].ToString().Trim();
                                     pedidosclientesList.FG = Convert.ToDateTime(dtQueryListResult.Rows[i]["FG"]);
 
                                     oListPedidosClientes.Add(pedidosclientesList);
@@ -352,18 +353,32 @@ namespace VideoClubALFA.Controllers
 
             catch (SqlException ex)
             {
-                return Json(new { data = "Ocurrio un error: " + ex.Message + ", al consultar los clientes de la empresa." }, JsonRequestBehavior.AllowGet);
+                return Json(new { data = "Ocurrio un error: " + ex.Message + ", al consultar los pedidos de clientes de la empresa." }, JsonRequestBehavior.AllowGet);
             }
         }
 
-        public JsonResult SavePedidoCliente(PedidosClientes modelPedidoCliente, int diasBono)
+        public JsonResult SavePedidoCliente(PedidosClientes modelPedidoCliente)
         {
             try
             {
                 DataTable dtQueryResult = new DataTable();
                 DataTable dtQueryListResult = new DataTable();
 
-                using (SqlConnection con = new SqlConnection(DBConnection))
+                DateTime todayDate = DateTime.Today.Date;
+                if(modelPedidoCliente.IdTipoTransaccion == 2 && todayDate.Date > modelPedidoCliente.FechaInicio.Date.AddDays(modelPedidoCliente.DiasBono))
+                {
+                    modelPedidoCliente.IdStatusPedido = 2;
+                }
+                else if (modelPedidoCliente.IdTipoTransaccion == 2 && todayDate.Date <= modelPedidoCliente.FechaInicio.Date.AddDays(modelPedidoCliente.DiasBono))
+                {
+                    modelPedidoCliente.IdStatusPedido = 1;
+                }
+                else
+                {
+                    modelPedidoCliente.IdStatusPedido = 3;
+                }
+
+                    using (SqlConnection con = new SqlConnection(DBConnection))
                 {
 
                     //Alta
@@ -383,7 +398,7 @@ namespace VideoClubALFA.Controllers
                     SqlParameter inputparam02 = new SqlParameter("@idCliente", SqlDbType.Int)
                     {
                         Direction = ParameterDirection.Input,
-                        Value = modelPedidoCliente.IdCliente
+                        Value = modelPedidoCliente.IdCliente_Pedido
                     };
                     SqlParameter inputparam03 = new SqlParameter("@idTipoTransaccion", SqlDbType.Int)
                     {
@@ -408,14 +423,18 @@ namespace VideoClubALFA.Controllers
                     SqlParameter inputparam07 = new SqlParameter("@fechaFinalizacion", SqlDbType.Date)
                     {
                         Direction = ParameterDirection.Input,
-                        Value = modelPedidoCliente.FechaInicio.Date.AddDays(diasBono)
+                        Value = modelPedidoCliente.FechaInicio.Date.AddDays(modelPedidoCliente.DiasBono)
                     };
-                    SqlParameter inputparam08 = new SqlParameter("@totalPeliculas", SqlDbType.Bit)
+                    SqlParameter inputparam08 = new SqlParameter("@totalPeliculas", SqlDbType.Decimal)
                     {
                         Direction = ParameterDirection.Input,
                         Value = modelPedidoCliente.TotalPeliculas
                     };
-                   
+                    SqlParameter inputparam09 = new SqlParameter("@idStatusPedido", SqlDbType.Int)
+                    {
+                        Direction = ParameterDirection.Input,
+                        Value = modelPedidoCliente.IdStatusPedido
+                    };
 
                     if (modelPedidoCliente.IdPedidoCliente == null)
                     {
@@ -426,7 +445,8 @@ namespace VideoClubALFA.Controllers
                         cmdpedidoclienteregistration.Parameters.Add(inputparam05);
                         cmdpedidoclienteregistration.Parameters.Add(inputparam06);
                         cmdpedidoclienteregistration.Parameters.Add(inputparam07);
-                        cmdpedidoclienteregistration.Parameters.Add(inputparam08);                       
+                        cmdpedidoclienteregistration.Parameters.Add(inputparam08);
+                        cmdpedidoclienteregistration.Parameters.Add(inputparam09);
 
                         con.Open();
                         cmdpedidoclienteregistration.ExecuteNonQuery();
@@ -445,7 +465,8 @@ namespace VideoClubALFA.Controllers
                         cmdpedidoclienteedit.Parameters.Add(inputparam06);
                         cmdpedidoclienteedit.Parameters.Add(inputparam07);
                         cmdpedidoclienteedit.Parameters.Add(inputparam08);
-                       
+                        cmdpedidoclienteedit.Parameters.Add(inputparam09);
+
                         con.Open();
                         cmdpedidoclienteedit.ExecuteNonQuery();
                         con.Close();
@@ -475,7 +496,7 @@ namespace VideoClubALFA.Controllers
 
                 using (SqlConnection con = new SqlConnection(DBConnection))
                 {
-                    Clientes cliente = new Clientes();
+                    PedidosClientes pedidoscliente = new PedidosClientes();
                     using (SqlCommand cmdclienteconsulta = new SqlCommand("vc_sp_PedidoClienteGet", con))
                     {
                         cmdclienteconsulta.CommandType = CommandType.StoredProcedure;
@@ -490,23 +511,21 @@ namespace VideoClubALFA.Controllers
                             (sdalista).Fill(dtQueryListResult);
                             if (dtQueryListResult.Rows.Count > 0)
                             {
-                                cliente.IdCliente = Convert.ToInt32(dtQueryListResult.Rows[0]["idCliente"]);
-                                cliente.NumSocio = dtQueryListResult.Rows[0]["numSocio"].ToString().Trim();
-                                cliente.NombreCliente = dtQueryListResult.Rows[0]["NombreCliente"].ToString().Trim();
-                                cliente.ApellidoPaternoCliente = dtQueryListResult.Rows[0]["apellidoPaternoCliente"].ToString().Trim();
-                                cliente.ApellidoMaternoCliente = dtQueryListResult.Rows[0]["apellidoMaternoCliente"].ToString().Trim();
-                                cliente.TelefonoCliente = dtQueryListResult.Rows[0]["telefonoCliente"].ToString().Trim();
-                                cliente.EmailCliente = dtQueryListResult.Rows[0]["emailCliente"].ToString().Trim();
-                                cliente.StatusCliente = Convert.ToBoolean(dtQueryListResult.Rows[0]["statusCliente"]);
-
-                                cliente.IdBonos = Convert.ToInt32(dtQueryListResult.Rows[0]["idBonos"]);
-                                cliente.DescripcionBono = dtQueryListResult.Rows[0]["descripcionBono"].ToString().Trim();
-                                cliente.NumBonos = Convert.ToInt32(dtQueryListResult.Rows[0]["numBonos"]);
-                                cliente.PorcentajeSancion = (decimal)dtQueryListResult.Rows[0]["porcentajeSancion"];
-                                cliente.FG = Convert.ToDateTime(dtQueryListResult.Rows[0]["FG"]);
+                                pedidoscliente.IdPedidoCliente = Convert.ToInt32(dtQueryListResult.Rows[0]["idPedidoCliente"]);
+                                pedidoscliente.IdCliente = Convert.ToInt32(dtQueryListResult.Rows[0]["IdCliente"]);
+                                pedidoscliente.NumSocio = dtQueryListResult.Rows[0]["numSocio"].ToString().Trim();
+                                pedidoscliente.TituloPelicula = dtQueryListResult.Rows[0]["tituloPelicula"].ToString().Trim();
+                                pedidoscliente.ClasificacionPelicula = dtQueryListResult.Rows[0]["clasificacionPelicula"].ToString().Trim();
+                                pedidoscliente.FolioPelicula = dtQueryListResult.Rows[0]["folioPelicula"].ToString().Trim();
+                                pedidoscliente.TipoTransaccion = dtQueryListResult.Rows[0]["tipoTransaccion"].ToString().Trim();
+                                pedidoscliente.CantidadPeliculas = Convert.ToInt32(dtQueryListResult.Rows[0]["cantidadPeliculas"]);
+                                pedidoscliente.FechaInicio = Convert.ToDateTime(dtQueryListResult.Rows[0]["fechaInicio"]);
+                                pedidoscliente.FechaFinalizacion = Convert.ToDateTime(dtQueryListResult.Rows[0]["fechaFinalizacion"]);
+                                pedidoscliente.TotalPeliculas = (decimal)dtQueryListResult.Rows[0]["totalPeliculas"];
+                                pedidoscliente.DescripcionStatusPedido = dtQueryListResult.Rows[0]["descripcionStatusPedido"].ToString().Trim();
+                                pedidoscliente.FG = Convert.ToDateTime(dtQueryListResult.Rows[0]["FG"]);
                             }
-
-                            return Json(new { cliente }, JsonRequestBehavior.AllowGet);
+                            return Json(new { pedidoscliente }, JsonRequestBehavior.AllowGet);
                         }
                     }
                 }

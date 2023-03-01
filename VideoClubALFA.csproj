@@ -144,6 +144,7 @@
     <Compile Include="Models\PedidosProveedor.cs" />
     <Compile Include="Models\Peliculas.cs" />
     <Compile Include="Models\Proveedores.cs" />
+    <Compile Include="Models\StatusPedidos.cs" />
     <Compile Include="Models\sysdiagrams.cs" />
     <Compile Include="Models\TipoTransacciones.cs" />
     <Compile Include="Models\Transacciones.cs" />

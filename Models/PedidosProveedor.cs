@@ -26,6 +26,7 @@ namespace VideoClubALFA.Models
         public string NumPedidoProveedor { get; set; }
 
         public decimal TotalPedidoProveedor { get; set; }
+        public int IdStatusPedido { get; set; }
 
         public DateTime FG { get; set; }
 
